@@ -27,6 +27,7 @@ import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import { Auth } from "../firebase/auth";
 import { useAuthProvider } from "@/providers/AuthProvider";
 import { upsertUser } from "@/dao/UserDao";
+import Logo from "./Logo";
 
 // const user = {
 //   name: "Jane Spoonfighter",
@@ -172,11 +173,11 @@ export default function Header() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" py="md">
-        <div>Open Trinity</div>
+      <Group justify="space-between" py="sm" h="64px">
+        <Logo />
 
         {/* <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" /> */}
-        <div>
+        <Group>
           {loading ? (
             <AwaitingAuthResultIndicator />
           ) : user ? (
@@ -185,7 +186,7 @@ export default function Header() {
             <SignInButton />
           )}
           <ColorSchemeToggle />
-        </div>
+        </Group>
       </Group>
     </Container>
   );
