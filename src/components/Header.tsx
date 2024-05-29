@@ -6,7 +6,6 @@ import {
   Avatar,
   Text,
   rem,
-  useMantineTheme,
   Button,
   Loader,
   ActionIcon,
@@ -22,7 +21,7 @@ import {
   IconMessageCircleQuestion,
 } from "@tabler/icons-react";
 
-import { useDisclosure } from "@mantine/hooks";
+// import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import { Auth } from "../firebase/auth";
@@ -38,8 +37,6 @@ import { upsertUser } from "@/dao/UserDao";
 
 function UserMenu() {
   const [userMenuOpened, setUserMenuOpened] = useState(false);
-
-  const theme = useMantineTheme();
 
   const { user, role } = useAuthProvider();
 
@@ -60,19 +57,20 @@ function UserMenu() {
       transitionProps={{ transition: "pop-top-right" }}
       onClose={() => setUserMenuOpened(false)}
       onOpen={() => setUserMenuOpened(true)}
+      opened={userMenuOpened}
       withinPortal
     >
       <Menu.Target>
         <UnstyledButton>
           <Group gap={7}>
             <Avatar
-              src={user.photoURL}
-              alt={user.displayName!}
+              src={user!.photoURL!}
+              alt={user!.displayName!}
               radius="xl"
               size={20}
             />
             <Text fw={500} size="sm" lh={1} mr={3}>
-              {user.displayName}
+              {user!.displayName}
             </Text>
             <IconChevronDown
               style={{ width: rem(12), height: rem(12) }}
@@ -162,7 +160,7 @@ function SignInButton() {
 }
 
 export default function Header() {
-  const [opened, { toggle }] = useDisclosure(false);
+  // const [opened, { toggle }] = useDisclosure(false);
 
   const { user, loading } = useAuthProvider();
 

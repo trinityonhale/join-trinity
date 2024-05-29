@@ -1,7 +1,7 @@
 import { Role } from "@/db/constants";
 import { Model } from "@/db/model";
 import { db } from "@/firebase";
-import { addDoc, getDoc, collection, doc, setDoc } from "firebase/firestore";
+import { getDoc, collection, doc, setDoc } from "firebase/firestore";
 
 export function upsertUser(user: Model.User['data']) {
     return setDoc(doc(collection(db, 'users'), user.uid), user)

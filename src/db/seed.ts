@@ -1,4 +1,5 @@
-import { Role, QuestUrgency, Schema, SCHEMA_VERSION } from './schema'
+import { Schema, SCHEMA_VERSION } from './schema'
+import { Role, QuestUrgency } from './constants'
 
 const adminUser: Schema.User = {
     id: 'abcd-efgh-ijkl-mnop',
@@ -28,3 +29,4 @@ const quest: Schema.Quest = {
 }
 
 // TODO: Insert adminUser, user, and quest into the database
+console.log(adminUser, user, quest)
