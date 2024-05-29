@@ -4,10 +4,17 @@ service cloud.firestore {
 
   match /databases/{database}/documents {
 
+    function verifyFields(required, optional) {
+      let defaultFields = ['schemaVersion'];
+      let allAllowedFields = required.concat(optional);
+      return request.resource.data.keys().hasAll(required.concat(defaultFields)) &&
+        request.resource.data.keys().hasOnly(allAllowedFields.concat(defaultFields));
+    }
+
     match /{document=**} {
       allow write, read: if false;
     }
-    
+
     match /projects/{document=**} {
     	allow write: if request.auth.token.admin == true;
       allow read: if true;
@@ -18,10 +25,24 @@ service cloud.firestore {
       allow read: if true;
     }
     
-    match /users/{document=**} {
-      allow get: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth.uid == resource.id;
+    match /users/{uid} {
+
+      // is same user, can only update displayName and photoUrl
+      allow update: if request.auth.uid == uid
+       && resource.data.uid == request.auth.uid
+       && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'displayName', 'photoUrl'
+      ]);
+
+      // user can only read their own data
+      allow get: if request.auth.uid == uid
+    }
+
+    match /users/{documents=**} {
+      // user is logged in, has all fields, role is user
+      allow create: if request.auth != null && verifyFields([
+        'uid', 'displayName', 'photoUrl', 'role'
+      ],[]) && request.resource.data.role == 'user'
     }
     
     // user can toggle their own participation

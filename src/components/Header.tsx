@@ -27,7 +27,9 @@ import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import { Auth } from "../firebase/auth";
 import { useAuthProvider } from "@/providers/AuthProvider";
 import { upsertUser } from "@/dao/UserDao";
+import { Model } from "@/db/model";
 import Logo from "./Logo";
+import { Role } from "@/db/constants";
 
 // const user = {
 //   name: "Jane Spoonfighter",
@@ -131,11 +133,12 @@ function SignInButton() {
         return;
       }
 
-      upsertUser({
+      await upsertUser(user.uid, {
+        schemaVersion: 1,
         uid: user.uid,
         displayName: user.displayName!,
         photoUrl: user.photoURL!,
-        role: "user",
+        role: Role.user,
       });
 
       notifications.show({
@@ -166,7 +169,7 @@ export default function Header() {
   const { user, loading } = useAuthProvider();
 
   const AwaitingAuthResultIndicator = () => (
-    <ActionIcon variant="light">
+    <ActionIcon variant="light" size="lg">
       <Loader size="xs" />
     </ActionIcon>
   );
