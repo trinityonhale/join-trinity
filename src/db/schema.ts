@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore';
 import { Role, QuestUrgency } from './constants';
 
 export const SCHEMA_VERSION = 1;
@@ -21,5 +22,6 @@ export namespace Schema {
         details: string,
         urgency: QuestUrgency,
         assignedTo: string, // 1:1 relationship with User.id
+        createdAt: Timestamp,
     }
 }

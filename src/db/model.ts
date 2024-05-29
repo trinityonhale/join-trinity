@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore';
 import { Role, QuestUrgency } from './constants';
 
 export namespace Model {
@@ -17,15 +18,12 @@ export namespace Model {
         role: Role;
     }
 
-    export function make<T>(data: any): T {
-        return Object.assign(new UserV1(), data)
-    }
-
     export type QuestV1 = BaseModel & {
         schemaVersion: 1,
         title: string,
         details: string,
         urgency: QuestUrgency,
-        assignedTo: AnyUser
+        assignedTo?: AnyUser,
+        createdAt: Timestamp,
     }
 }

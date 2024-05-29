@@ -27,9 +27,10 @@ import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import { Auth } from "../firebase/auth";
 import { useAuthProvider } from "@/providers/AuthProvider";
 import { upsertUser } from "@/dao/UserDao";
-import { Model } from "@/db/model";
 import Logo from "./Logo";
 import { Role } from "@/db/constants";
+import { modals } from "@mantine/modals";
+import CreateQuestsForm from "@/fragments/CreateQuestsForm";
 
 // const user = {
 //   name: "Jane Spoonfighter",
@@ -52,6 +53,13 @@ function UserMenu() {
       color: "blue",
     });
   };
+
+  const createNewQuestHandler = () => {
+    modals.open({
+      title: "Create new quest",
+      children: <CreateQuestsForm />,
+    })
+  }
 
   return (
     <Menu
@@ -89,16 +97,19 @@ function UserMenu() {
           </Box>
         )}
 
-        <Menu.Item
-          leftSection={
-            <IconMessageCircleQuestion
-              style={{ width: rem(16), height: rem(16) }}
-              stroke={1.5}
-            />
-          }
-        >
-          Create new quest
-        </Menu.Item>
+        {role == "admin" && (
+          <Menu.Item
+            onClick={createNewQuestHandler}
+            leftSection={
+              <IconMessageCircleQuestion
+                style={{ width: rem(16), height: rem(16) }}
+                stroke={1.5}
+              />
+            }
+          >
+            Create new quest
+          </Menu.Item>
+        )}
 
         <Menu.Divider />
         <Menu.Item

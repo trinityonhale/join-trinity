@@ -11,15 +11,19 @@
     "firebase:emulators": "firebase emulators:start --export-on-exit './emulator_export' --import './emulator_export'"
   },
   "dependencies": {
-    "@mantine/core": "7.9.2",
-    "@mantine/hooks": "7.9.2",
+    "@mantine/core": "^7.10.0",
+    "@mantine/form": "^7.10.0",
+    "@mantine/hooks": "^7.10.0",
+    "@mantine/modals": "^7.10.0",
     "@mantine/notifications": "^7.10.0",
     "@tabler/icons-react": "^3.5.0",
     "firebase": "^10.12.1",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.2.0",

@@ -11,22 +11,20 @@ service cloud.firestore {
         request.resource.data.keys().hasOnly(allAllowedFields.concat(defaultFields));
     }
 
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     match /{document=**} {
       allow write, read: if false;
     }
 
-    match /projects/{document=**} {
-    	allow write: if request.auth.token.admin == true;
+    match /quests/{document=**} {
       allow read: if true;
+      allow write: if isAdmin();
     }
-    
-    match /tasks/{document=**} {
-      allow write: if request.auth.token.admin == true;
-      allow read: if true;
-    }
-    
-    match /users/{uid} {
 
+    match /users/{uid} {
       // is same user, can only update displayName and photoUrl
       allow update: if request.auth.uid == uid
        && resource.data.uid == request.auth.uid
@@ -43,27 +41,6 @@ service cloud.firestore {
       allow create: if request.auth != null && verifyFields([
         'uid', 'displayName', 'photoUrl', 'role'
       ],[]) && request.resource.data.role == 'user'
-    }
-    
-    // user can toggle their own participation
-    match /tasks/{document=**}/participants/{userId} {
-      allow write: if request.auth.uid == userId;
-      allow read: if true;
-    }
-    
-    // user can toggle their own assignment to subtasks
-		match /subtasks/{assigneeId} {
-      allow read: if true;
-      allow read, write: if request.auth.uid == assigneeId || resource.data.status == 'NOT_ASSIGNED';
-    }
-    
-    match /subtasks/{status} {
-      allow read, write: if request.auth.uid == resource.data.assigneeId;
-    }
-    
-    match /subtasks/{document=**} {
-      allow write: if request.auth.token.admin == true;
-      allow read: if true;
     }
   }
 }
