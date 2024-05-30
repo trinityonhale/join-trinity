@@ -1297,6 +1297,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nucleoidai/react-event@npm:^1.1.7":
+  version: 1.1.7
+  resolution: "@nucleoidai/react-event@npm:1.1.7"
+  dependencies:
+    uuid: "npm:^9.0.0"
+  checksum: 10c0/a858c260eee46109d5027831bee7ea6fd4473282660d15604cdc31f1b78ca2997512384f0bdf69919a85a2c6e9b80b9f08986da1f28e8ff57c9ab0494980e67c
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -4218,6 +4227,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:^9.0.0":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10c0/1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
+  languageName: node
+  linkType: hard
+
 "vite-min-template@workspace:.":
   version: 0.0.0-use.local
   resolution: "vite-min-template@workspace:."
@@ -4227,6 +4245,7 @@ __metadata:
     "@mantine/hooks": "npm:^7.10.0"
     "@mantine/modals": "npm:^7.10.0"
     "@mantine/notifications": "npm:^7.10.0"
+    "@nucleoidai/react-event": "npm:^1.1.7"
     "@tabler/icons-react": "npm:^3.5.0"
     "@types/lodash": "npm:^4"
     "@types/react": "npm:^18.2.65"

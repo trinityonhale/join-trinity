@@ -9,6 +9,9 @@ import {
   QueryDocumentSnapshot,
   Query,
   DocumentReference,
+  DocumentSnapshot,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import * as Model from "@/db/model";
@@ -40,4 +43,8 @@ export async function getNextPageOfQuests(
 
 export async function createQuest(quest: Model.QuestV1): Promise<DocumentReference> {
   return addDoc(collection(db, "quests"), quest);
+}
+
+export async function getQuest(id: string): Promise<DocumentSnapshot> {
+  return getDoc(doc(db, "quests", id));
 }

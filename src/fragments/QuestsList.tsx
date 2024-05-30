@@ -1,8 +1,10 @@
 import QuestCard from "@/components/QuestCard";
-import { SimpleGrid, Loader, Group, Button } from "@mantine/core";
+import { SimpleGrid, Loader, Group, Button, Text } from "@mantine/core";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { getNextPageOfQuests } from "@/dao/QuestDao";
+import { EVT_QUEST_CREATED } from "@/events";
+import { subscribe } from "@nucleoidai/react-event";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,16 +35,21 @@ export default function QuestsList(props: {
 
     setQuests([...quests, ...nextPage]);
     setLoading(false);
-
-    console.log(nextPage);
   };
 
   useEffect(() => {
     loadQuests();
+
+    subscribe(EVT_QUEST_CREATED, (quest: QueryDocumentSnapshot) => {
+      setQuests((quests) => ([quest, ...quests]));
+    })
+
+    console.log('i fire once');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // it has more data
   const showLoadMoreButton = () => hasMoreData && !loading && quests.length > 0;
+  const hasNoData = () => !loading && quests.length === 0;
 
   return (
     <>
@@ -69,6 +76,10 @@ export default function QuestsList(props: {
             Load more
           </Button>
         )}
+      </Group>
+
+      <Group justify="center">
+        {hasNoData() && <Text>Behold, no quests found</Text>}
       </Group>
     </>
   );

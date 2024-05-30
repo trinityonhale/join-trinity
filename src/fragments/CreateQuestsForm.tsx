@@ -2,10 +2,12 @@ import { QuestUrgency } from "@/db/constants";
 import { Button, Group, Select, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { ComboboxData } from "@mantine/core";
-import { createQuest } from "@/dao/QuestDao";
+import { createQuest, getQuest } from "@/dao/QuestDao";
 import { notifications } from "@mantine/notifications";
 import { modals } from "@mantine/modals";
-import { Timestamp } from "firebase/firestore";
+import { DocumentReference, Timestamp } from "firebase/firestore";
+import { EVT_QUEST_CREATED } from "@/events";
+import { publish } from "@nucleoidai/react-event";
 
 export default function CreateQuestsForm() {
   const form = useForm({
@@ -37,7 +39,7 @@ export default function CreateQuestsForm() {
       urgency: parseInt(values.urgency),
       schemaVersion: 1,
       createdAt: new Timestamp(new Date().getTime() / 1000, 0)
-    }).then(() => {
+    }).then(async (ref: DocumentReference) => {
       form.reset();
       modals.closeAll();
       notifications.show({
@@ -45,6 +47,7 @@ export default function CreateQuestsForm() {
         message: "Quest has been created successfully",
         color: "green",
       })
+      publish(EVT_QUEST_CREATED, await getQuest(ref.id))
     })
   }
 
@@ -69,7 +72,7 @@ export default function CreateQuestsForm() {
         />
 
         <Textarea
-          label="details"
+          label="Details"
           placeholder="Enter details"
           withAsterisk
           key="details"
