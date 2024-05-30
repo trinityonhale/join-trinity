@@ -57,6 +57,7 @@ export default function QuestsList(props: {
         {quests.map((quest) => (
           <QuestCard
             key={quest.id}
+            id={quest.id}
             quest={{
               schemaVersion: quest.data().schemaVersion,
               title: quest.data().title,

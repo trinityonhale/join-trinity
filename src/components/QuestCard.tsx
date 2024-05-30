@@ -1,9 +1,10 @@
 import { Card, Group, Badge, Text } from "@mantine/core";
 import * as Model from "@/db/model";
 import { QuestUrgency } from "@/db/constants";
+import { Link } from "react-router-dom";
 
-export default function QuestCard(props: { quest: Model.AnyQuest }) {
-  const { quest } = props;
+export default function QuestCard(props: { quest: Model.AnyQuest, id: string }) {
+  const { quest, id } = props;
 
   enum QuestUrgencyColor {
     low = "green",
@@ -12,6 +13,7 @@ export default function QuestCard(props: { quest: Model.AnyQuest }) {
   }
 
   return (
+    <Link to={`/quests/${id}`} style={{ textDecoration: 'none' }}>
     <Card withBorder padding="lg" radius="md">
       <Group justify="space-between">
         <Badge
@@ -35,5 +37,6 @@ export default function QuestCard(props: { quest: Model.AnyQuest }) {
         {quest.details.substring(0, 300)}
       </Text>
     </Card>
+    </Link>
   );
 }
