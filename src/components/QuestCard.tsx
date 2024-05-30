@@ -31,7 +31,7 @@ export default function QuestCard(props: { quest: Model.AnyQuest }) {
       <Text fz="lg" fw={500} mt="md">
         {quest.title}
       </Text>
-      <Text fz="sm" c="dimmed" mt={5} lineClamp={5}>
+      <Text fz="sm" c="dimmed" mt={5} lineClamp={5} h={108}>
         {quest.details.substring(0, 300)}
       </Text>
     </Card>

@@ -26,12 +26,12 @@ export async function getNextPageOfQuests(
   if (lastDocument) {
     baseQuery = query(
       baseQuery,
-      orderBy("urgency"),
-      orderBy("createdAt"),
+      orderBy("urgency", "desc"),
+      orderBy("createdAt", "desc"),
       startAfter(lastDocument)
     );
   } else {
-    baseQuery = query(baseQuery, orderBy("urgency"), orderBy("createdAt"));
+    baseQuery = query(baseQuery, orderBy("urgency", "desc"), orderBy("createdAt", "desc"));
   }
 
   const nextPageQuery = query(baseQuery, limit(pageSize));
