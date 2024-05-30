@@ -10,6 +10,7 @@ import {
   Loader,
   ActionIcon,
   Box,
+  Divider,
 } from "@mantine/core";
 
 import { notifications } from "@mantine/notifications";
@@ -24,7 +25,7 @@ import {
 // import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { ColorSchemeToggle } from "./ColorSchemeToggle";
-import { Auth } from "../firebase/auth";
+import * as Auth from "../firebase/auth";
 import { useAuthProvider } from "@/providers/AuthProvider";
 import { upsertUser } from "@/dao/UserDao";
 import Logo from "./Logo";
@@ -58,8 +59,8 @@ function UserMenu() {
     modals.open({
       title: "Create new quest",
       children: <CreateQuestsForm />,
-    })
-  }
+    });
+  };
 
   return (
     <Menu
@@ -188,7 +189,13 @@ export default function Header() {
   return (
     <Container size="xl">
       <Group justify="space-between" py="sm" h="64px">
-        <Logo />
+        <Group>
+          <Logo />
+          <Divider orientation="vertical" />
+          <Text fs="xl" fw={500} c="dimmed">
+            Quests Board
+          </Text>
+        </Group>
 
         {/* <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" /> */}
         <Group>

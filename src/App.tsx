@@ -1,6 +1,6 @@
 import "@mantine/core/styles.css";
 import '@mantine/notifications/styles.css';
-import { MantineProvider } from "@mantine/core";
+import { Container, MantineProvider } from "@mantine/core";
 import { theme } from "./theme";
 import Header from "./components/Header";
 import { Notifications } from "@mantine/notifications";
@@ -13,7 +13,11 @@ export default function App() {
       <ModalsProvider>
         <Notifications position="top-right" mt="64px"/>
         <Header />
-        <QuestsList />
+        <Container size="xl" mt="xl">
+          <QuestsList 
+            cols={{ base: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
+          />
+        </Container>
       </ModalsProvider>
     </MantineProvider>
   );

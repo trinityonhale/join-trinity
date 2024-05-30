@@ -11,7 +11,7 @@ import {
   DocumentReference,
 } from "firebase/firestore";
 import { db } from "@/firebase";
-import { Model } from "@/db/model";
+import * as Model from "@/db/model";
 
 export async function getNextPageOfQuests(
   lastDocument: QueryDocumentSnapshot | null,

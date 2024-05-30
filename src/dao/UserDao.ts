@@ -1,5 +1,5 @@
 import { Role } from "@/db/constants";
-import { Model } from "@/db/model";
+import * as Model from "@/db/model";
 import { db } from "@/firebase";
 import { getDoc, doc, setDoc, updateDoc } from "firebase/firestore";
 

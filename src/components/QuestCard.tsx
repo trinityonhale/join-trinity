@@ -1,5 +1,5 @@
 import { Card, Group, Badge, Text } from "@mantine/core";
-import { Model } from "@/db/model";
+import * as Model from "@/db/model";
 import { QuestUrgency } from "@/db/constants";
 
 export default function QuestCard(props: { quest: Model.AnyQuest }) {
@@ -31,8 +31,8 @@ export default function QuestCard(props: { quest: Model.AnyQuest }) {
       <Text fz="lg" fw={500} mt="md">
         {quest.title}
       </Text>
-      <Text fz="sm" c="dimmed" mt={5}>
-        {quest.details.substring(0, 100)}
+      <Text fz="sm" c="dimmed" mt={5} lineClamp={5}>
+        {quest.details.substring(0, 300)}
       </Text>
     </Card>
   );
