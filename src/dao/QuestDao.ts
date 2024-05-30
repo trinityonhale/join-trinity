@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import * as Model from "@/db/model";
+import { QuestStatus } from "@/db/constants";
 
 export async function getNextPageOfQuests(
   lastDocument: QueryDocumentSnapshot | null,
@@ -42,7 +43,10 @@ export async function getNextPageOfQuests(
 }
 
 export async function createQuest(quest: Model.QuestV1): Promise<DocumentReference> {
-  return addDoc(collection(db, "quests"), quest);
+  return addDoc(collection(db, "quests"), {
+    ...quest,
+    status: QuestStatus.open,
+  });
 }
 
 export async function getQuest(id: string): Promise<DocumentSnapshot> {

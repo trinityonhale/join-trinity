@@ -19,8 +19,7 @@ export default function CreateQuestsForm() {
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : "Title is required"),
-      details: (value) =>
-        value.trim().length > 0 ? null : "Details is required",
+      details: () => null, // No validation for details (optional field)
       urgency: (value) => value == null && "Urgency is required",
     },
   });
@@ -74,7 +73,6 @@ export default function CreateQuestsForm() {
         <Textarea
           label="Details"
           placeholder="Enter details"
-          withAsterisk
           key="details"
           {...form.getInputProps("details")}
         />

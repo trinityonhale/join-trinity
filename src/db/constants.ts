@@ -8,3 +8,8 @@ export enum QuestUrgency {
     medium = 2,
     high = 3
 }
+
+export enum QuestStatus {
+    open = 'open',
+    closed = 'closed'
+}

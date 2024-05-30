@@ -1,8 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
-import { Role, QuestUrgency } from './constants';
+import { Role, QuestUrgency, QuestStatus } from './constants';
 
 export const SCHEMA_VERSION = 1;
-
 
 interface BaseDocument {
     id: string,
@@ -18,8 +17,9 @@ export type User = BaseDocument & {
 
 export type Quest = BaseDocument & {
     title: string,
-    details: string,
+    details?: string,
     urgency: QuestUrgency,
     assignedTo: string, // 1:1 relationship with User.id
     createdAt: Timestamp,
+    status: QuestStatus
 }

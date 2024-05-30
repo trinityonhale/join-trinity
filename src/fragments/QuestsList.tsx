@@ -6,7 +6,7 @@ import { getNextPageOfQuests } from "@/dao/QuestDao";
 import { EVT_QUEST_CREATED } from "@/events";
 import { subscribe } from "@nucleoidai/react-event";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 
 export default function QuestsList(props: {
   cols?: {
@@ -71,7 +71,7 @@ export default function QuestsList(props: {
 
       <Group justify="center">{loading && <Loader color="blue" />}</Group>
 
-      <Group justify="center">
+      <Group justify="center" mt="xl">
         {showLoadMoreButton() && (
           <Button onClick={loadQuests} color="blue">
             Load more

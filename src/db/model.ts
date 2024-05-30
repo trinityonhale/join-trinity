@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
-import { Role, QuestUrgency } from './constants';
+import { Role, QuestUrgency, QuestStatus } from './constants';
 
 interface BaseModel {
     schemaVersion?: number,
@@ -19,8 +19,9 @@ export interface UserV1 extends BaseModel {
 export type QuestV1 = BaseModel & {
     schemaVersion: 1,
     title: string,
-    details: string,
+    details?: string,
     urgency: QuestUrgency,
     assignedTo?: AnyUser,
     createdAt: Timestamp,
+    status: QuestStatus,
 }
