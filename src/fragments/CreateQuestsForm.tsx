@@ -1,4 +1,4 @@
-import { QuestUrgency } from "@/db/constants";
+import { QuestStatus, QuestUrgency } from "@/db/constants";
 import { Button, Group, Select, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { ComboboxData } from "@mantine/core";
@@ -36,6 +36,7 @@ export default function CreateQuestsForm() {
       title: values.title,
       details: values.details,
       urgency: parseInt(values.urgency),
+      status: QuestStatus.open,
       schemaVersion: 1,
       createdAt: new Timestamp(new Date().getTime() / 1000, 0)
     }).then(async (ref: DocumentReference) => {

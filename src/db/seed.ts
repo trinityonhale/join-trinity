@@ -1,5 +1,7 @@
-import { Schema, SCHEMA_VERSION } from './schema'
-import { Role, QuestUrgency } from './constants'
+import { SCHEMA_VERSION } from './schema'
+import * as Schema from './schema'
+import { Role, QuestUrgency, QuestStatus } from './constants'
+import { Timestamp } from 'firebase/firestore'
 
 const adminUser: Schema.User = {
     id: 'abcd-efgh-ijkl-mnop',
@@ -25,7 +27,9 @@ const quest: Schema.Quest = {
     title: 'Example Quest',
     details: 'This is an example quest',
     urgency: QuestUrgency.high,
-    assignedTo: user.id
+    status: QuestStatus.open,
+    assignedTo: user.id,
+    createdAt: Timestamp.now()
 }
 
 // TODO: Insert adminUser, user, and quest into the database
