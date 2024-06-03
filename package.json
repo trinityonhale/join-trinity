@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "firebase:emulators": "firebase emulators:start --export-on-exit './emulator_export' --import './emulator_export'"
+    "firebase:emulators": "firebase emulators:start --export-on-exit './emulator_export' --import './emulator_export'",
+    "firebase:hosting:preview": "firebase hosting:channel:deploy staging"
   },
   "dependencies": {
     "@mantine/core": "^7.10.0",

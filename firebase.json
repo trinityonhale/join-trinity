@@ -16,6 +16,14 @@
     "singleProjectMode": true
   },
   "hosting": {
-    "public": "dist"
+    "cleanUrls": true,
+    "public": "dist",
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }, {
+      "source": "!/@(js|css|svg)/**",
+      "destination": "/index.html"
+    }]
   }
 }

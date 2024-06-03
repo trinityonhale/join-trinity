@@ -6,7 +6,7 @@ import Header from "./components/Header";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import QuestsList from "./fragments/QuestsList";
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import ShowQuestDetail from "./fragments/ShowQuestDetail";
 
 function Quests () {
@@ -27,6 +27,7 @@ export default function App() {
         <Notifications position="top-right" mt="64px" />
         <Header />
           <Routes>
+            <Route path="/" element={<Navigate to="/quests" />} />
             <Route path="/quests" element={<Quests />}>
               <Route path=":id" element={<ShowQuestDetail />} />
             </Route>
