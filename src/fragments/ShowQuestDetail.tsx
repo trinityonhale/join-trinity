@@ -15,21 +15,36 @@ import { IconInfoCircle } from "@tabler/icons-react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Model from "@/db/model";
 import { useState, useEffect } from "react";
-import { getQuest } from "@/dao/QuestDao";
+import { changeQuestStatus, deleteQuest, getQuest, getQuestAssignments, takeQuest, withdrawQuest } from "@/dao/QuestDao";
 import QuestUrgencyBadge from "@/components/QuestUrgencyBadge";
-import { QuestUrgency } from "@/db/constants";
+import { QuestStatus, QuestUrgency, Role } from "@/db/constants";
 import { useAuthProvider } from "@/providers/AuthProvider";
+import { modals } from "@mantine/modals";
+import { publish } from "@nucleoidai/react-event";
+import { EVT_QUEST_DELETED } from "@/events";
 
-function QuestInProgressAlert() {
+function QuestInProgressAlert(props: { assignment: Model.RetrievedQuestAssignment | null }) {
   const icon = <IconInfoCircle />;
+
+  const title = (
+    <Stack gap={0}>
+      <Text fw="bold">
+        Quest in progress 🎉
+      </Text>
+      <Text c="dimmed" size="sm">
+        Accepted at: {props.assignment?.assignedAt.toDate().toLocaleDateString()}
+      </Text>
+    </Stack>
+  )
+
   return (
     <Alert
       variant="light"
       color="blue"
-      title="Quest in progress 🎉"
+      title={title}
       icon={icon}
     >
-      %username is currently working on this quest, we thank them for their help
+      {props.assignment?.assignee.displayName} is currently working on this quest, we thank them for their help
     </Alert>
   );
 }
@@ -43,9 +58,16 @@ function QuestTitle(props: { quest: Model.AnyQuest | null }) {
             {props.quest.title}
           </Text>
           <Group gap="xs">
-            <Badge variant="dot" color="green">
-              Open
-            </Badge>
+            {props.quest.status === "closed" && (
+              <Badge variant="dot" color="red">
+                Closed
+              </Badge>
+            )}
+            {props.quest.status === "open" && (
+              <Badge variant="dot" color="green">
+                Open
+              </Badge>
+            )}
             <QuestUrgencyBadge urgency={props.quest.urgency as QuestUrgency} />
             <Text size="sm" c="dimmed">
               {props.quest.createdAt.toDate().toLocaleDateString()}&nbsp;
@@ -88,18 +110,71 @@ export default function ShowQuestDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const { role } = useAuthProvider();
+  const { role, user } = useAuthProvider();
 
   const [quest, setQuest] = useState<Model.AnyQuest | null>(null);
+  const [assignment, setAssignment] = useState<Model.RetrievedQuestAssignment | null>(null);
 
-  useEffect(() => {
+  const fetchQuest = async () => {
     getQuest(id!).then((doc) => {
       setQuest(doc.data() as Model.AnyQuest);
+      getQuestAssignments(id!).then((doc) => {
+        console.log(doc)
+        setAssignment(doc);
+      });
     });
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchQuest();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const close = () => {
     navigate("/quests");
+  };
+
+  const markAsClosed = () => {
+    changeQuestStatus(id!, QuestStatus.closed).then(() => {
+      fetchQuest();
+    });
+  };
+
+  const markAsOpened = () => {
+    changeQuestStatus(id!, QuestStatus.open).then(() => {
+      fetchQuest();
+    });
+  };
+
+  const assignQuest = () => {
+    takeQuest(id!, user!.uid).then(() => {
+      fetchQuest();
+    })
+  }
+
+  const unassignQuest = () => {
+    withdrawQuest(id!).then(() => {
+      fetchQuest();
+    })
+  }
+
+  const remove = () => {
+    const onConfirm = () => {
+      deleteQuest(id!).then(() => {
+        publish(EVT_QUEST_DELETED, id);
+        close();
+      });
+    };
+    modals.openConfirmModal({
+      title: "Delete quest",
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this quest? This action cannot be
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: onConfirm,
+    });
   };
 
   return (
@@ -113,13 +188,22 @@ export default function ShowQuestDetail() {
       >
         <Stack mih="50vh">
           <Box flex={1}>
-            <QuestInProgressAlert />
+            { assignment && (
+              <QuestInProgressAlert assignment={assignment} />
+            )}
+
             <Text flex={1} mb="lg" mt="md">
               {quest?.details}
             </Text>
 
             <Group>
-              <Button variant="light">Accept the quest</Button>
+              {!assignment && (
+                <Button variant="light" onClick={assignQuest}>Take this quest</Button>
+              )}
+
+              {assignment && (role == Role.admin || assignment.assignee.uid == user!.uid) && (
+                <Button variant="light" onClick={unassignQuest}>Withdraw</Button>
+              )}
             </Group>
           </Box>
 
@@ -134,15 +218,19 @@ export default function ShowQuestDetail() {
             <Box>
               <Divider mb="md"></Divider>
               <Group>
-                <Button color="green" variant="light">
-                  Mark as closed
-                </Button>
-                <Button color="grape" variant="light">
-                  Re-open
-                </Button>
+                {quest?.status === "open" && (
+                  <Button color="green" variant="light" onClick={markAsClosed}>
+                    Mark as closed
+                  </Button>
+                )}
+                {quest?.status === "closed" && (
+                  <Button color="grape" variant="light" onClick={markAsOpened}>
+                    Re-open
+                  </Button>
+                )}
                 <Button variant="light">Edit</Button>
 
-                <Button color="red" variant="outline">
+                <Button color="red" variant="outline" onClick={remove}>
                   Delete
                 </Button>
               </Group>

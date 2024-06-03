@@ -3,7 +3,7 @@ import { SimpleGrid, Loader, Group, Button, Text } from "@mantine/core";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { getNextPageOfQuests } from "@/dao/QuestDao";
-import { EVT_QUEST_CREATED } from "@/events";
+import { EVT_QUEST_CREATED, EVT_QUEST_DELETED } from "@/events";
 import { subscribe } from "@nucleoidai/react-event";
 
 const ITEMS_PER_PAGE = 12;
@@ -44,6 +44,10 @@ export default function QuestsList(props: {
       setQuests((quests) => ([quest, ...quests]));
     })
 
+    subscribe(EVT_QUEST_DELETED, (id: string) => {
+      setQuests((quests) => quests.filter((quest) => quest.id !== id));
+    })
+
     console.log('i fire once');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -64,6 +68,7 @@ export default function QuestsList(props: {
               details: quest.data().details,
               urgency: quest.data().urgency,
               createdAt: quest.data().createdAt,
+              status: quest.data().status,
             }}
           />
         ))}

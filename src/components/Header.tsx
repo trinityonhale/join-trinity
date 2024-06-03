@@ -112,6 +112,8 @@ function UserMenu() {
           </Menu.Item>
         )}
 
+        <Menu.Item disabled>My Quests</Menu.Item>
+
         <Menu.Divider />
         <Menu.Item
           onClick={logout}

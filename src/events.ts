@@ -1,1 +1,2 @@
 export const EVT_QUEST_CREATED = "QUEST_CREATED";
+export const EVT_QUEST_DELETED = "QUEST_DELETED";

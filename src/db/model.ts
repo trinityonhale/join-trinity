@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase/firestore';
+import { DocumentReference, Timestamp } from 'firebase/firestore';
 import { Role, QuestUrgency, QuestStatus } from './constants';
 
 interface BaseModel {
@@ -17,11 +17,22 @@ export interface UserV1 extends BaseModel {
 }
 
 export type QuestV1 = BaseModel & {
-    schemaVersion: 1,
+    readonly schemaVersion: 1,
     title: string,
     details?: string,
     urgency: QuestUrgency,
     assignedTo?: AnyUser,
     createdAt: Timestamp,
     status: QuestStatus,
+    assignnment?: QuestAssignment,
+}
+
+export type QuestAssignment = {
+    assignee: DocumentReference,
+    assignedAt: Timestamp,
+}
+
+export type RetrievedQuestAssignment = {
+    assignee: AnyUser,
+    assignedAt: Timestamp,
 }
