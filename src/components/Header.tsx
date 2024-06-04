@@ -2,7 +2,6 @@ import {
   Container,
   Group,
   Menu,
-  UnstyledButton,
   Avatar,
   Text,
   rem,
@@ -11,7 +10,10 @@ import {
   ActionIcon,
   Box,
   Divider,
+  em
 } from "@mantine/core";
+
+import { useMediaQuery } from '@mantine/hooks';
 
 import { notifications } from "@mantine/notifications";
 
@@ -45,6 +47,8 @@ function UserMenu() {
 
   const { user, role } = useAuthProvider();
 
+  const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
+
   const logout = async () => {
     await Auth.signOut();
     notifications.show({
@@ -73,13 +77,27 @@ function UserMenu() {
       withinPortal
     >
       <Menu.Target>
-        <UnstyledButton>
+        <Box>
+        {isMobile && (
+          <ActionIcon
+            size="lg"
+            variant="default"
+          >
+            <Avatar
+              src={user!.photoURL!}
+              alt={user!.displayName!}
+              radius="xs"
+            />
+          </ActionIcon>
+        )}
+        {!isMobile && (
+        <Button variant="default">
           <Group gap={7}>
             <Avatar
               src={user!.photoURL!}
               alt={user!.displayName!}
-              radius="xl"
-              size={20}
+              radius="xs"
+              size="sm"
             />
             <Text fw={500} size="sm" lh={1} mr={3}>
               {user!.displayName}
@@ -89,7 +107,9 @@ function UserMenu() {
               stroke={1.5}
             />
           </Group>
-        </UnstyledButton>
+        </Button>
+        )}
+        </Box>
       </Menu.Target>
       <Menu.Dropdown>
         {role == "admin" && (

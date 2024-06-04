@@ -7,6 +7,7 @@ import {
   Avatar,
   Box,
   Divider,
+  em,
 } from "@mantine/core";
 
 import { Alert } from "@mantine/core";
@@ -29,6 +30,7 @@ import { modals } from "@mantine/modals";
 import { publish } from "@nucleoidai/react-event";
 import { EVT_QUEST_DELETED } from "@/events";
 import QuestStatusBadge from "@/components/QuestStatusBadge";
+import { useMediaQuery } from '@mantine/hooks';
 
 function QuestInProgressAlert(props: {
   assignment: Model.RetrievedQuestAssignment | null;
@@ -128,6 +130,8 @@ export default function ShowQuestDetail() {
 
   const { role, user } = useAuthProvider();
 
+  const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
+
   const [quest, setQuest] = useState<Model.AnyQuest | null>(null);
   const [assignment, setAssignment] =
     useState<Model.RetrievedQuestAssignment | null>(null);
@@ -201,6 +205,7 @@ export default function ShowQuestDetail() {
         opened
         onClose={close}
         title={<QuestTitle quest={quest} />}
+        fullScreen={isMobile}
         centered
       >
         <Stack mih="50vh">
