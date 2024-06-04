@@ -133,3 +133,6 @@ dist
 
 # Firebase emulator
 emulator_export/
+
+# Firebase
+.firebase/
