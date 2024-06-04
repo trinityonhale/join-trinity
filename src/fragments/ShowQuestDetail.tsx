@@ -62,12 +62,12 @@ function QuestInProgressAlert(props: {
       radius="lg"
       mt="md"
     >
-      {assignment?.assignee.uid == user!.uid
+      {assignment?.assignee.uid == user?.uid
         ? "You are currently working on this quest, thank you for your help"
         : `This quest is currently being worked on by ${assignment?.assignee.displayName}, we thank them for their help.`}
       <Box mt="md">
         {assignment &&
-          (role == Role.admin || assignment.assignee.uid == user!.uid) && (
+          (role == Role.admin || assignment.assignee.uid == user?.uid) && (
             <Button variant="outline" onClick={unassignQuest}>
               Withdraw
             </Button>
