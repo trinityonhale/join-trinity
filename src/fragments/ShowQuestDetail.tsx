@@ -14,7 +14,14 @@ import { IconInfoCircle } from "@tabler/icons-react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Model from "@/db/model";
 import { useState, useEffect } from "react";
-import { changeQuestStatus, deleteQuest, getQuest, getQuestAssignments, takeQuest, withdrawQuest } from "@/dao/QuestDao";
+import {
+  changeQuestStatus,
+  deleteQuest,
+  getQuest,
+  getQuestAssignments,
+  takeQuest,
+  withdrawQuest,
+} from "@/dao/QuestDao";
 import QuestUrgencyBadge from "@/components/QuestUrgencyBadge";
 import { QuestStatus, QuestUrgency, Role } from "@/db/constants";
 import { useAuthProvider } from "@/providers/AuthProvider";
@@ -23,19 +30,25 @@ import { publish } from "@nucleoidai/react-event";
 import { EVT_QUEST_DELETED } from "@/events";
 import QuestStatusBadge from "@/components/QuestStatusBadge";
 
-function QuestInProgressAlert(props: { assignment: Model.RetrievedQuestAssignment | null }) {
+function QuestInProgressAlert(props: {
+  assignment: Model.RetrievedQuestAssignment | null;
+  unassignQuest: () => void;
+}) {
+  const { user, role } = useAuthProvider();
+  const { assignment, unassignQuest } = props;
+
   const icon = <IconInfoCircle />;
 
   const title = (
     <Stack gap={0}>
-      <Text fw="bold">
+      <Text fw="bold" lh={1}>
         Quest in progress 🎉
       </Text>
-      <Text c="dimmed" size="sm">
-        Accepted at: {props.assignment?.assignedAt.toDate().toLocaleDateString()}
+      <Text c="dimmed" size="sm" mt={4}>
+        {props.assignment?.assignedAt.toDate().toLocaleDateString()}
       </Text>
     </Stack>
-  )
+  );
 
   return (
     <Alert
@@ -43,8 +56,20 @@ function QuestInProgressAlert(props: { assignment: Model.RetrievedQuestAssignmen
       color="blue"
       title={title}
       icon={icon}
+      radius="lg"
+      mt="md"
     >
-      {props.assignment?.assignee.displayName} is currently working on this quest, we thank them for their help
+      {assignment?.assignee.uid == user!.uid
+        ? "You are currently working on this quest, thank you for your help"
+        : `This quest is currently being worked on by ${assignment?.assignee.displayName}, we thank them for their help.`}
+      <Box mt="md">
+        {assignment &&
+          (role == Role.admin || assignment.assignee.uid == user!.uid) && (
+            <Button variant="outline" onClick={unassignQuest}>
+              Withdraw
+            </Button>
+          )}
+      </Box>
     </Alert>
   );
 }
@@ -104,13 +129,14 @@ export default function ShowQuestDetail() {
   const { role, user } = useAuthProvider();
 
   const [quest, setQuest] = useState<Model.AnyQuest | null>(null);
-  const [assignment, setAssignment] = useState<Model.RetrievedQuestAssignment | null>(null);
+  const [assignment, setAssignment] =
+    useState<Model.RetrievedQuestAssignment | null>(null);
 
   const fetchQuest = async () => {
     getQuest(id!).then((doc) => {
       setQuest(doc.data() as Model.AnyQuest);
       getQuestAssignments(id!).then((doc) => {
-        console.log(doc)
+        console.log(doc);
         setAssignment(doc);
       });
     });
@@ -131,7 +157,7 @@ export default function ShowQuestDetail() {
   };
 
   const markAsOpened = () => {
-    changeQuestStatus(id!, QuestStatus.open).then(() => {
+    changeQuestStatus(id!, assignment != null ? QuestStatus.adopted : QuestStatus.open).then(() => {
       fetchQuest();
     });
   };
@@ -139,14 +165,14 @@ export default function ShowQuestDetail() {
   const assignQuest = () => {
     takeQuest(id!, user!.uid).then(() => {
       fetchQuest();
-    })
-  }
+    });
+  };
 
   const unassignQuest = () => {
     withdrawQuest(id!).then(() => {
       fetchQuest();
-    })
-  }
+    });
+  };
 
   const remove = () => {
     const onConfirm = () => {
@@ -179,23 +205,46 @@ export default function ShowQuestDetail() {
       >
         <Stack mih="50vh">
           <Box flex={1}>
-            { assignment && (
-              <QuestInProgressAlert assignment={assignment} />
+            {assignment && quest!.status !== QuestStatus.closed && (
+              <QuestInProgressAlert
+                assignment={assignment}
+                unassignQuest={unassignQuest}
+              />
+            )}
+
+            {assignment && quest!.status === QuestStatus.closed && (
+              <Alert
+                title="Quest completed"
+                color="green"
+                icon={<IconInfoCircle />}
+                radius="lg"
+                mt="md"
+              >
+                This quest has been completed by {assignment.assignee.displayName}
+              </Alert>
+            )}
+
+            {!assignment && quest?.status === QuestStatus.closed && (
+              <Alert
+                title="Quest closed"
+                color="red"
+                icon={<IconInfoCircle />}
+                radius="lg"
+                mt="md"
+              >
+                This quest has been closed
+              </Alert>
             )}
 
             <Text flex={1} mb="lg" mt="md">
               {quest?.details}
             </Text>
 
-            <Group>
-              {!assignment && (
-                <Button variant="light" onClick={assignQuest}>Take this quest</Button>
-              )}
-
-              {assignment && (role == Role.admin || assignment.assignee.uid == user!.uid) && (
-                <Button variant="light" onClick={unassignQuest}>Withdraw</Button>
-              )}
-            </Group>
+            {!assignment && quest?.status !== QuestStatus.closed && (
+              <Button variant="outline" onClick={assignQuest}>
+                Take this quest
+              </Button>
+            )}
           </Box>
 
           {/* <Divider label="Comments" />
@@ -209,12 +258,12 @@ export default function ShowQuestDetail() {
             <Box>
               <Divider mb="md"></Divider>
               <Group>
-                {quest?.status === "open" && (
+                {quest?.status !== QuestStatus.closed && (
                   <Button color="green" variant="light" onClick={markAsClosed}>
                     Mark as closed
                   </Button>
                 )}
-                {quest?.status === "closed" && (
+                {quest?.status === QuestStatus.closed && (
                   <Button color="grape" variant="light" onClick={markAsOpened}>
                     Re-open
                   </Button>

@@ -44,6 +44,7 @@ service cloud.firestore {
 
       allow create: if isAdmin() || (isLoggedIn() && canAssign());
       allow delete: if isAdmin() || (isLoggedIn() && canUnassign());
+      allow read: if true;
     }
 
     match /users/{uid} {
@@ -54,8 +55,7 @@ service cloud.firestore {
         'displayName', 'photoUrl'
       ]);
 
-      // user can only read their own data
-      allow get: if request.auth.uid == uid
+      allow read: if true;
     }
 
     match /users/{documents=**} {
