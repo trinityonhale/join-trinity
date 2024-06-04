@@ -31,6 +31,7 @@ import { publish } from "@nucleoidai/react-event";
 import { EVT_QUEST_DELETED } from "@/events";
 import QuestStatusBadge from "@/components/QuestStatusBadge";
 import { useMediaQuery } from '@mantine/hooks';
+import useMeta from "@/hooks/useMeta";
 
 function QuestInProgressAlert(props: {
   assignment: Model.RetrievedQuestAssignment | null;
@@ -146,12 +147,16 @@ export default function ShowQuestDetail() {
     });
   };
 
+  useMeta({
+    title: quest?.title || "Loading",
+  });
+
   useEffect(() => {
     fetchQuest();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const close = () => {
-    navigate("/quests");
+    navigate(-1)
   };
 
   const markAsClosed = () => {

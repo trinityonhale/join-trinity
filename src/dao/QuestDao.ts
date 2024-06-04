@@ -16,6 +16,8 @@ import {
   deleteDoc,
   Timestamp,
   where,
+  documentId,
+  DocumentData,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import * as Model from "@/db/model";
@@ -85,7 +87,35 @@ export async function getQuestAssignments(id: string): Promise<Model.RetrievedQu
   }
 }
 
+async function createUserQuest(uid: string, questId: string): Promise<DocumentReference<DocumentData>> {
+  return addDoc(collection(db, "userQuests"), {
+    uid: uid,
+    questId: questId,
+  });
+}
+
+async function removeUserQuest(uid: string, questId: string): Promise<void> {
+  const snapshot = await getDocs(
+    query(
+      collection(db, "userQuests"),
+      where("uid", "==", uid),
+      where("questId", "==", questId)
+    )
+  )
+
+  snapshot.forEach((doc) => {
+    deleteDoc(doc.ref);
+  });
+}
+
+
 export async function deleteQuest(id: string): Promise<void> {
+  const assignment = await getQuestAssignments(id);
+
+  if (assignment) {
+    await removeUserQuest(assignment.assignee.uid, id);
+  }
+
   return deleteDoc(doc(db, "quests", id));
 }
 
@@ -97,6 +127,8 @@ export async function takeQuest(id: string, uid: string) {
     assignee: userRef
   }
 
+  await createUserQuest(uid, id);
+
   return addDoc(collection(db, "quests", id, "assignments"), payload).then(() => {
     return updateDoc(doc(db, "quests", id), {
       status: QuestStatus.adopted
@@ -105,6 +137,15 @@ export async function takeQuest(id: string, uid: string) {
 }
 
 export async function withdrawQuest(id: string) {
+
+  const assignment = await getQuestAssignments(id);
+
+  if (!assignment) {
+    return;
+  }
+
+  await removeUserQuest(assignment.assignee.uid, id);
+
   return getDocs(collection(db, "quests", id, "assignments")).then((snapshot) => {
     snapshot.forEach((doc) => {
       deleteDoc(doc.ref);
@@ -114,4 +155,27 @@ export async function withdrawQuest(id: string) {
       status: QuestStatus.open
     })
   })
+}
+
+export type QuestWrapper = {
+  id: string,
+  data: Model.AnyQuest
+}
+
+export async function getUserAdoptedQuests(uid: string) : Promise<QuestWrapper[]> {
+
+  const userQuests = await getDocs(
+    query(collection(db, "userQuests"), where("uid", "==", uid))
+  );
+
+  const questIds = userQuests.docs.map(doc => doc.data().questId);
+
+  const questDocs = await getDocs(
+    query(collection(db, "quests"), where(documentId(), "in", questIds))
+  );
+
+  return questDocs.docs.map(doc => ({
+    id: doc.id,
+    data: doc.data() as Model.AnyQuest
+  }));
 }

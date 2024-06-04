@@ -10,10 +10,10 @@ import {
   ActionIcon,
   Box,
   Divider,
-  em
+  em,
 } from "@mantine/core";
 
-import { useMediaQuery } from '@mantine/hooks';
+import { useMediaQuery } from "@mantine/hooks";
 
 import { notifications } from "@mantine/notifications";
 
@@ -22,6 +22,7 @@ import {
   IconLogout,
   IconBrandGoogleFilled,
   IconMessageCircleQuestion,
+  IconChecklist,
 } from "@tabler/icons-react";
 
 // import { useDisclosure } from "@mantine/hooks";
@@ -34,6 +35,7 @@ import Logo from "./Logo";
 import { Role } from "@/db/constants";
 import { modals } from "@mantine/modals";
 import CreateQuestsForm from "@/fragments/CreateQuestsForm";
+import { Link } from "react-router-dom";
 
 // const user = {
 //   name: "Jane Spoonfighter",
@@ -78,37 +80,34 @@ function UserMenu() {
     >
       <Menu.Target>
         <Box>
-        {isMobile && (
-          <ActionIcon
-            size="lg"
-            variant="default"
-          >
-            <Avatar
-              src={user!.photoURL!}
-              alt={user!.displayName!}
-              radius="xs"
-            />
-          </ActionIcon>
-        )}
-        {!isMobile && (
-        <Button variant="default">
-          <Group gap={7}>
-            <Avatar
-              src={user!.photoURL!}
-              alt={user!.displayName!}
-              radius="xs"
-              size="sm"
-            />
-            <Text fw={500} size="sm" lh={1} mr={3}>
-              {user!.displayName}
-            </Text>
-            <IconChevronDown
-              style={{ width: rem(12), height: rem(12) }}
-              stroke={1.5}
-            />
-          </Group>
-        </Button>
-        )}
+          {isMobile && (
+            <ActionIcon size="lg" variant="default">
+              <Avatar
+                src={user!.photoURL!}
+                alt={user!.displayName!}
+                radius="xs"
+              />
+            </ActionIcon>
+          )}
+          {!isMobile && (
+            <Button variant="default">
+              <Group gap={7}>
+                <Avatar
+                  src={user!.photoURL!}
+                  alt={user!.displayName!}
+                  radius="xs"
+                  size="sm"
+                />
+                <Text fw={500} size="sm" lh={1} mr={3}>
+                  {user!.displayName}
+                </Text>
+                <IconChevronDown
+                  style={{ width: rem(12), height: rem(12) }}
+                  stroke={1.5}
+                />
+              </Group>
+            </Button>
+          )}
         </Box>
       </Menu.Target>
       <Menu.Dropdown>
@@ -132,7 +131,18 @@ function UserMenu() {
           </Menu.Item>
         )}
 
-        <Menu.Item disabled>My Quests</Menu.Item>
+        <Menu.Item
+          leftSection={
+            <IconChecklist
+              style={{ width: rem(16), height: rem(16) }}
+              stroke={1.5}
+            />
+          }
+          component={Link}
+          to="/my-quests"
+        >
+          My Quests
+        </Menu.Item>
 
         <Menu.Divider />
         <Menu.Item

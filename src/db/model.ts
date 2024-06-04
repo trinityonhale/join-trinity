@@ -36,3 +36,8 @@ export type RetrievedQuestAssignment = {
     assignee: AnyUser,
     assignedAt: Timestamp,
 }
+
+export type UserQuest = {
+    uid: string,
+    questId: string,
+}

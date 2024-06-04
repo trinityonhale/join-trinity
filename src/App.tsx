@@ -8,8 +8,8 @@ import { ModalsProvider } from "@mantine/modals";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Quests from "./views/Quests";
+import MyQuests from "./views/MyQuests";
 import ShowQuestDetail from "./fragments/ShowQuestDetail";
-
 
 export default function App() {
 
@@ -20,6 +20,9 @@ export default function App() {
         <Header />
           <Routes>
             <Route path="/" element={<Navigate to="/quests" />} />
+            <Route path="/my-quests" element={<MyQuests />}>
+              <Route path=":id" element={<ShowQuestDetail />} />
+            </Route>
             <Route path="/quests" element={<Quests />}>
               <Route path=":id" element={<ShowQuestDetail />} />
             </Route>

@@ -14,6 +14,8 @@ import { getNextPageOfQuests } from "@/dao/QuestDao";
 import { EVT_QUEST_CREATED, EVT_QUEST_DELETED } from "@/events";
 import { subscribe } from "@nucleoidai/react-event";
 import { QuestStatus } from "@/db/constants";
+import { Link } from "react-router-dom";
+import useMeta from "@/hooks/useMeta";
 
 function QuestFilter(props: { status: QuestStatus, onChange: (status: QuestStatus) => void}) {
   const { status, onChange } = props;
@@ -99,6 +101,11 @@ export default function QuestsList(props: {
     setLastQuest(null);
   }
 
+  useMeta({
+    title: "Quests",
+    description: "View and manage quests",
+  });
+
   useEffect(() => {
     loadQuests();
 
@@ -119,22 +126,26 @@ export default function QuestsList(props: {
 
   return (
     <>
-      <QuestFilter status={status} onChange={onStatusChange}/>
+      <QuestFilter status={status} onChange={onStatusChange} />
 
       <SimpleGrid cols={props.cols} mt="lg">
         {quests.map((quest) => (
-          <QuestCard
+          <Link
             key={quest.id}
-            id={quest.id}
-            quest={{
-              schemaVersion: quest.data().schemaVersion,
-              title: quest.data().title,
-              details: quest.data().details,
-              urgency: quest.data().urgency,
-              createdAt: quest.data().createdAt,
-              status: quest.data().status,
-            }}
-          />
+            to={`/quests/${quest.id}`}
+            style={{ textDecoration: "none" }}
+          >
+            <QuestCard
+              quest={{
+                schemaVersion: quest.data().schemaVersion,
+                title: quest.data().title,
+                details: quest.data().details,
+                urgency: quest.data().urgency,
+                createdAt: quest.data().createdAt,
+                status: quest.data().status,
+              }}
+            />
+          </Link>
         ))}
       </SimpleGrid>
 
