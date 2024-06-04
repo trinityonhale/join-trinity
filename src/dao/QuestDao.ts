@@ -15,6 +15,7 @@ import {
   updateDoc,
   deleteDoc,
   Timestamp,
+  where,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import * as Model from "@/db/model";
@@ -22,7 +23,8 @@ import { QuestStatus } from "@/db/constants";
 
 export async function getNextPageOfQuests(
   lastDocument: QueryDocumentSnapshot | null,
-  pageSize: number
+  pageSize: number,
+  status: QuestStatus = QuestStatus.open
 ): Promise<QueryDocumentSnapshot[]> {
   let baseQuery: Query = collection(db, "quests");
 
@@ -30,12 +32,17 @@ export async function getNextPageOfQuests(
   if (lastDocument) {
     baseQuery = query(
       baseQuery,
+      where("status", "==", status),
       orderBy("urgency", "desc"),
       orderBy("createdAt", "desc"),
       startAfter(lastDocument)
     );
   } else {
-    baseQuery = query(baseQuery, orderBy("urgency", "desc"), orderBy("createdAt", "desc"));
+    baseQuery = query(baseQuery, 
+      where("status", "==", status),
+      orderBy("urgency", "desc"),
+      orderBy("createdAt", "desc")
+    );
   }
 
   const nextPageQuery = query(baseQuery, limit(pageSize));
@@ -90,13 +97,21 @@ export async function takeQuest(id: string, uid: string) {
     assignee: userRef
   }
 
-  return addDoc(collection(db, "quests", id, "assignments"), payload);
+  return addDoc(collection(db, "quests", id, "assignments"), payload).then(() => {
+    return updateDoc(doc(db, "quests", id), {
+      status: QuestStatus.adopted
+    })
+  })
 }
 
 export async function withdrawQuest(id: string) {
   return getDocs(collection(db, "quests", id, "assignments")).then((snapshot) => {
     snapshot.forEach((doc) => {
       deleteDoc(doc.ref);
+    })
+
+    return updateDoc(doc(db, "quests", id), {
+      status: QuestStatus.open
     })
   })
 }

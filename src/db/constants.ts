@@ -11,5 +11,6 @@ export enum QuestUrgency {
 
 export enum QuestStatus {
     open = 'open',
+    adopted = 'adopted',
     closed = 'closed'
 }

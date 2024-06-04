@@ -5,7 +5,6 @@ import {
   Stack,
   Text,
   Avatar,
-  Badge,
   Box,
   Divider,
 } from "@mantine/core";
@@ -22,6 +21,7 @@ import { useAuthProvider } from "@/providers/AuthProvider";
 import { modals } from "@mantine/modals";
 import { publish } from "@nucleoidai/react-event";
 import { EVT_QUEST_DELETED } from "@/events";
+import QuestStatusBadge from "@/components/QuestStatusBadge";
 
 function QuestInProgressAlert(props: { assignment: Model.RetrievedQuestAssignment | null }) {
   const icon = <IconInfoCircle />;
@@ -58,16 +58,7 @@ function QuestTitle(props: { quest: Model.AnyQuest | null }) {
             {props.quest.title}
           </Text>
           <Group gap="xs">
-            {props.quest.status === "closed" && (
-              <Badge variant="dot" color="red">
-                Closed
-              </Badge>
-            )}
-            {props.quest.status === "open" && (
-              <Badge variant="dot" color="green">
-                Open
-              </Badge>
-            )}
+            <QuestStatusBadge status={props.quest.status as QuestStatus} />
             <QuestUrgencyBadge urgency={props.quest.urgency as QuestUrgency} />
             <Text size="sm" c="dimmed">
               {props.quest.createdAt.toDate().toLocaleDateString()}&nbsp;

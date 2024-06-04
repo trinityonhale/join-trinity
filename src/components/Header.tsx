@@ -190,12 +190,12 @@ export default function Header() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" py="sm" h="64px">
+      <Group justify="space-between" py="sm">
         <Group>
           <Logo />
           <Divider orientation="vertical" />
           <Text fs="xl" fw={500} c="dimmed">
-            Quests Board
+            Quest Board
           </Text>
         </Group>
 

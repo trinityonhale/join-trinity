@@ -1,8 +1,9 @@
-import { Card, Group, Text, Stack, Badge } from "@mantine/core";
+import { Card, Group, Text, Stack } from "@mantine/core";
 import * as Model from "@/db/model";
-import { QuestUrgency } from "@/db/constants";
+import { QuestStatus, QuestUrgency } from "@/db/constants";
 import { Link } from "react-router-dom";
 import QuestUrgencyBadge from "./QuestUrgencyBadge";
+import QuestStatusBadge from "./QuestStatusBadge";
 
 export default function QuestCard(props: {
   quest: Model.AnyQuest;
@@ -15,17 +16,8 @@ export default function QuestCard(props: {
       <Card withBorder padding="lg" radius="md">
         <Group justify="space-between">
           <Group gap="sm">
-          {quest.status === "closed" && (
-            <Badge variant="dot" color="red">
-              Closed
-            </Badge>
-          )}
-          {quest.status === "open" && (
-            <Badge variant="dot" color="green">
-              Open
-            </Badge>
-          )}
-          <QuestUrgencyBadge urgency={quest.urgency as QuestUrgency} />
+            <QuestStatusBadge status={quest.status as QuestStatus} />
+            <QuestUrgencyBadge urgency={quest.urgency as QuestUrgency} />
           </Group>
           <Text c="dimmed" fz="sm">
             {quest.createdAt.toDate().toLocaleDateString()}
