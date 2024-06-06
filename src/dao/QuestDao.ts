@@ -170,6 +170,10 @@ export async function getUserAdoptedQuests(uid: string) : Promise<QuestWrapper[]
 
   const questIds = userQuests.docs.map(doc => doc.data().questId);
 
+  if (questIds.length === 0) {
+    return [];
+  }
+
   const questDocs = await getDocs(
     query(collection(db, "quests"), where(documentId(), "in", questIds))
   );

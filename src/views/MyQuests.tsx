@@ -1,7 +1,7 @@
 import { getUserAdoptedQuests } from "@/dao/QuestDao";
 import useMeta from "@/hooks/useMeta";
 import { useAuthProvider } from "@/providers/AuthProvider";
-import { Button, Container, SimpleGrid, Title } from "@mantine/core";
+import { Button, Container, Loader, SimpleGrid, Title, Text } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
@@ -11,6 +11,7 @@ import { QuestWrapper } from "@/dao/QuestDao";
 export default function MyQuests() {
   const { user } = useAuthProvider();
   const [quests, setQuests] = useState<QuestWrapper[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useMeta({
     title: "My Quests",
@@ -21,9 +22,13 @@ export default function MyQuests() {
     if (!user) return;
 
     getUserAdoptedQuests(user!.uid).then((quests) => {
+      setLoading(true);
       setQuests(quests);
+      setLoading(false);
     });
   }, [user]);
+
+  const isEmpty = () => !loading && quests.length === 0;
 
   return (
     <Container size="xl" mt="xl">
@@ -53,6 +58,9 @@ export default function MyQuests() {
           </Link>
         ))}
       </SimpleGrid>
+
+      {loading && <Loader color="blue" />}
+      {isEmpty() && <Text c="dimmed">No quests found</Text>}
 
       <Outlet />
     </Container>
