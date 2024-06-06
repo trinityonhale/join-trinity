@@ -26,7 +26,7 @@ import {
 } from "@tabler/icons-react";
 
 // import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import * as Auth from "../firebase/auth";
 import { useAuthProvider } from "@/providers/AuthProvider";
@@ -34,7 +34,6 @@ import { upsertUser } from "@/dao/UserDao";
 import Logo from "./Logo";
 import { Role } from "@/db/constants";
 import { modals } from "@mantine/modals";
-import CreateQuestsForm from "@/fragments/CreateQuestsForm";
 import { Link } from "react-router-dom";
 
 // const user = {
@@ -62,9 +61,17 @@ function UserMenu() {
   };
 
   const createNewQuestHandler = () => {
+    const Form = lazy(() => import("@/fragments/CreateQuestsForm"))
+
     modals.open({
       title: "Create new quest",
-      children: <CreateQuestsForm />,
+      size: "xl",
+      centered: true,
+      children: (
+        <Suspense>
+          <Form />
+        </Suspense>
+      ),
     });
   };
 

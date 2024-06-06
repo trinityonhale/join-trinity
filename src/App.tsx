@@ -6,10 +6,12 @@ import Header from "./components/Header";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { Routes, Route, Navigate } from "react-router-dom";
+import loadable from "@loadable/component";
 
-import Quests from "./views/Quests";
-import MyQuests from "./views/MyQuests";
-import ShowQuestDetail from "./fragments/ShowQuestDetail";
+const Quests = loadable(() => import("./views/Quests"));
+const MyQuests = loadable(() => import("./views/MyQuests"));
+const ShowQuestDetail = loadable(() => import("./fragments/ShowQuestDetail"));
+
 
 export default function App() {
 

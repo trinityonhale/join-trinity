@@ -8,7 +8,10 @@ import {
   Box,
   Divider,
   em,
+  TypographyStylesProvider,
 } from "@mantine/core";
+
+import DOMPurify from 'dompurify';
 
 import { Alert } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -246,9 +249,11 @@ export default function ShowQuestDetail() {
               </Alert>
             )}
 
-            <Text flex={1} mb="lg" mt="md">
-              {quest?.details}
-            </Text>
+            <Box flex={1} mb="lg" mt="md">
+            <TypographyStylesProvider>
+              { <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(quest?.details || "") }} /> }
+            </TypographyStylesProvider>
+            </Box>
 
             {!assignment && quest?.status !== QuestStatus.closed && (
               <Button variant="outline" onClick={assignQuest}>

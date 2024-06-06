@@ -137,6 +137,7 @@ export default function QuestsList(props: {
           >
             <QuestCard
               quest={{
+                excerpt: quest.data().excerpt,
                 schemaVersion: quest.data().schemaVersion,
                 title: quest.data().title,
                 details: quest.data().details,

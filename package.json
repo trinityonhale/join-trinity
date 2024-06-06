@@ -12,13 +12,22 @@
     "firebase:hosting:preview": "firebase hosting:channel:deploy staging"
   },
   "dependencies": {
-    "@mantine/core": "^7.10.0",
+    "@loadable/component": "^5.16.4",
+    "@mantine/core": "^7.10.1",
     "@mantine/form": "^7.10.0",
-    "@mantine/hooks": "^7.10.0",
+    "@mantine/hooks": "^7.10.1",
     "@mantine/modals": "^7.10.0",
     "@mantine/notifications": "^7.10.0",
+    "@mantine/tiptap": "^7.10.1",
     "@nucleoidai/react-event": "^1.1.7",
     "@tabler/icons-react": "^3.5.0",
+    "@tiptap/extension-image": "^2.4.0",
+    "@tiptap/extension-link": "^2.4.0",
+    "@tiptap/extension-underline": "^2.4.0",
+    "@tiptap/pm": "^2.4.0",
+    "@tiptap/react": "^2.4.0",
+    "@tiptap/starter-kit": "^2.4.0",
+    "dompurify": "^3.1.5",
     "firebase": "^10.12.1",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
@@ -26,6 +35,8 @@
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {
+    "@types/dompurify": "^3",
+    "@types/loadable__component": "^5",
     "@types/lodash": "^4",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",

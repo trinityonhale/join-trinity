@@ -21,6 +21,7 @@ export type QuestV1 = BaseModel & {
     title: string,
     details?: string,
     urgency: QuestUrgency,
+    excerpt?: string,
     assignedTo?: AnyUser,
     createdAt: Timestamp,
     status: QuestStatus,

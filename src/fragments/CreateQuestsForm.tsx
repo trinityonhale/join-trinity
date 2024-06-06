@@ -1,5 +1,5 @@
 import { QuestStatus, QuestUrgency } from "@/db/constants";
-import { Button, Group, Select, Textarea, TextInput } from "@mantine/core";
+import { Button, Group, InputWrapper, Select, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { ComboboxData } from "@mantine/core";
 import { createQuest, getQuest } from "@/dao/QuestDao";
@@ -8,6 +8,7 @@ import { modals } from "@mantine/modals";
 import { DocumentReference, Timestamp } from "firebase/firestore";
 import { EVT_QUEST_CREATED } from "@/events";
 import { publish } from "@nucleoidai/react-event";
+import Editor from "@/components/Editor";
 
 export default function CreateQuestsForm() {
   const form = useForm({
@@ -31,10 +32,17 @@ export default function CreateQuestsForm() {
       label: key.charAt(0).toUpperCase() + key.slice(1),
     }));
 
+  const getExcerpt = (details: string) => {
+    const elem = document.createElement("div");
+    elem.innerHTML = details;
+    return elem.innerText.substring(0, 100);
+  }
+
   const handleSubmit = async (values: typeof form.values) => {
     createQuest({
       title: values.title,
       details: values.details,
+      excerpt: getExcerpt(values.details),
       urgency: parseInt(values.urgency),
       status: QuestStatus.open,
       schemaVersion: 1,
@@ -54,6 +62,7 @@ export default function CreateQuestsForm() {
   return (
     <div>
       <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack gap="sm">
         <TextInput
           label="Title"
           placeholder="Enter title"
@@ -71,16 +80,16 @@ export default function CreateQuestsForm() {
           {...form.getInputProps("urgency")}
         />
 
-        <Textarea
-          label="Details"
-          placeholder="Enter details"
-          key="details"
+        <InputWrapper label="Details" {...form.getInputProps("details")}>
+        <Editor 
           {...form.getInputProps("details")}
         />
+        </InputWrapper>
 
         <Group justify="flex-end" mt="md">
           <Button type="submit">Create</Button>
         </Group>
+        </Stack>
       </form>
     </div>
   );
