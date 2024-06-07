@@ -71,6 +71,15 @@ export async function getQuest(id: string): Promise<DocumentSnapshot> {
   return getDoc(doc(db, "quests", id));
 }
 
+export async function updateQuest(id: string, quest: Model.QuestV1): Promise<void> {
+  return updateDoc(doc(db, "quests", id), {
+    title: quest.title,
+    details: quest.details,
+    urgency: quest.urgency,
+    excerpt: quest.excerpt,
+  });
+}
+
 export async function getQuestAssignments(id: string): Promise<Model.RetrievedQuestAssignment | null> {
   const snapshot = await getDocs(collection(db, "quests", id, "assignments"));
   if (snapshot.empty) {

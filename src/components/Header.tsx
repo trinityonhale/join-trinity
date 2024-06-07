@@ -35,6 +35,11 @@ import Logo from "./Logo";
 import { Role } from "@/db/constants";
 import { modals } from "@mantine/modals";
 import { Link } from "react-router-dom";
+import { createQuest, getQuest } from "@/dao/QuestDao";
+import { UseFormReturnType } from "@mantine/form";
+import { DocumentReference } from "firebase/firestore";
+import { publish } from "@nucleoidai/react-event";
+import { EVT_QUEST_CREATED } from "@/events";
 
 // const user = {
 //   name: "Jane Spoonfighter",
@@ -63,13 +68,33 @@ function UserMenu() {
   const createNewQuestHandler = () => {
     const Form = lazy(() => import("@/fragments/CreateQuestsForm"))
 
+    const submitHandler = async (values: any, form: UseFormReturnType<any>) => {
+      createQuest(values).then(async (ref: DocumentReference) => {
+        form.reset();
+        // TODO: close current maybe 
+        modals.closeAll();
+        notifications.show({
+          title: "Quest created",
+          message: "Quest has been created successfully",
+          color: "green",
+        })
+        publish(EVT_QUEST_CREATED, await getQuest(ref.id))
+      }).catch((error) => {
+        notifications.show({
+          title: "Failed to create quest",
+          message: error.message,
+          color: "red",
+        })
+      })
+    }
+
     modals.open({
       title: "Create new quest",
       size: "xl",
       centered: true,
       children: (
         <Suspense>
-          <Form />
+          <Form submitHandler={submitHandler} />
         </Suspense>
       ),
     });

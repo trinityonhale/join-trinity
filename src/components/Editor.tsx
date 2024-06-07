@@ -43,13 +43,15 @@ function ImageUploadButton() {
 }
 
 export default function Editor({
+  defaultValue,
   value,
   onChange,
 }: {
+  defaultValue?: string;
   value?: string;
   onChange: (value: string) => void;
 }) {
-  const [content, setContent] = useState<string | undefined>(value);
+  const [content, setContent] = useState<string | undefined>(defaultValue || value || "");
 
   const handleChange = useCallback(
     (newContent: string) => {

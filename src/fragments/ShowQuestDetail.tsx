@@ -206,6 +206,10 @@ export default function ShowQuestDetail() {
     });
   };
 
+  const edit = () => {
+    navigate(`/quests/${id}/edit`);
+  }
+
   return (
     <>
       <Modal
@@ -283,7 +287,7 @@ export default function ShowQuestDetail() {
                     Re-open
                   </Button>
                 )}
-                <Button variant="light">Edit</Button>
+                <Button variant="light" onClick={edit}>Edit</Button>
 
                 <Button color="red" variant="outline" onClick={remove}>
                   Delete
@@ -292,6 +296,7 @@ export default function ShowQuestDetail() {
             </Box>
           )}
         </Stack>
+
       </Modal>
     </>
   );

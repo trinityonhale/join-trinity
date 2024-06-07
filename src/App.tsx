@@ -7,6 +7,7 @@ import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { Routes, Route, Navigate } from "react-router-dom";
 import loadable from "@loadable/component";
+import EditQuest from "./fragments/EditQuest";
 
 const Quests = loadable(() => import("./views/Quests"));
 const MyQuests = loadable(() => import("./views/MyQuests"));
@@ -27,6 +28,7 @@ export default function App() {
             </Route>
             <Route path="/quests" element={<Quests />}>
               <Route path=":id" element={<ShowQuestDetail />} />
+              <Route path=":id/edit" element={<EditQuest />} />
             </Route>
           </Routes>
       </ModalsProvider>

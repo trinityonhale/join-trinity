@@ -1,22 +1,36 @@
 import { QuestStatus, QuestUrgency } from "@/db/constants";
-import { Button, Group, InputWrapper, Select, Stack, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import {
+  Button,
+  Group,
+  InputWrapper,
+  Select,
+  Stack,
+  TextInput,
+} from "@mantine/core";
+import { useForm, UseFormReturnType } from "@mantine/form";
 import { ComboboxData } from "@mantine/core";
-import { createQuest, getQuest } from "@/dao/QuestDao";
-import { notifications } from "@mantine/notifications";
-import { modals } from "@mantine/modals";
-import { DocumentReference, Timestamp } from "firebase/firestore";
-import { EVT_QUEST_CREATED } from "@/events";
-import { publish } from "@nucleoidai/react-event";
 import Editor from "@/components/Editor";
+import { Timestamp } from "firebase/firestore";
 
-export default function CreateQuestsForm() {
-  const form = useForm({
+type QuestFormValues = {
+  title: any;
+  details: any;
+  urgency: any;
+};
+
+export default function CreateQuestsForm({
+  quest,
+  submitHandler,
+}: {
+  quest?: any;
+  submitHandler: (values: any, form: UseFormReturnType<any>) => Promise<any>;
+}) {
+  const form: UseFormReturnType<QuestFormValues> = useForm({
     mode: "uncontrolled",
     initialValues: {
-      title: "",
-      details: "",
-      urgency: "2",
+      title: quest?.title || "",
+      details: quest?.details || "",
+      urgency: quest?.urgency.toString() || null,
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : "Title is required"),
@@ -36,59 +50,52 @@ export default function CreateQuestsForm() {
     const elem = document.createElement("div");
     elem.innerHTML = details;
     return elem.innerText.substring(0, 100);
-  }
+  };
 
   const handleSubmit = async (values: typeof form.values) => {
-    createQuest({
+    const propagatedValues = {
       title: values.title,
       details: values.details,
       excerpt: getExcerpt(values.details),
       urgency: parseInt(values.urgency),
       status: QuestStatus.open,
       schemaVersion: 1,
-      createdAt: new Timestamp(new Date().getTime() / 1000, 0)
-    }).then(async (ref: DocumentReference) => {
-      form.reset();
-      modals.closeAll();
-      notifications.show({
-        title: "Quest created",
-        message: "Quest has been created successfully",
-        color: "green",
-      })
-      publish(EVT_QUEST_CREATED, await getQuest(ref.id))
-    })
-  }
+      createdAt: new Timestamp(new Date().getTime() / 1000, 0),
+    };
+
+    submitHandler(propagatedValues, form);
+  };
+
+  console.log("form", form.getInputProps("details"));
 
   return (
     <div>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="sm">
-        <TextInput
-          label="Title"
-          placeholder="Enter title"
-          withAsterisk
-          key="title"
-          {...form.getInputProps("title")}
-        />
+          <TextInput
+            label="Title"
+            placeholder="Enter title"
+            withAsterisk
+            key="title"
+            {...form.getInputProps("title")}
+          />
 
-        <Select
-          label="Urgency"
-          placeholder="Select urgency"
-          withAsterisk
-          key="urgency"
-          data={urgencyOptions}
-          {...form.getInputProps("urgency")}
-        />
+          <Select
+            label="Urgency"
+            placeholder="Select urgency"
+            withAsterisk
+            key="urgency"
+            data={urgencyOptions}
+            {...form.getInputProps("urgency")}
+          />
 
-        <InputWrapper label="Details" {...form.getInputProps("details")}>
-        <Editor 
-          {...form.getInputProps("details")}
-        />
-        </InputWrapper>
+          <InputWrapper label="Details" {...form.getInputProps("details")}>
+            <Editor {...form.getInputProps("details")} />
+          </InputWrapper>
 
-        <Group justify="flex-end" mt="md">
-          <Button type="submit">Create</Button>
-        </Group>
+          <Group justify="flex-end" mt="md">
+            <Button type="submit">{quest ? "Save" : "Create"}</Button>
+          </Group>
         </Stack>
       </form>
     </div>
