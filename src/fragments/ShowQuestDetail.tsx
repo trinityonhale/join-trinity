@@ -177,8 +177,29 @@ export default function ShowQuestDetail() {
   const assignQuest = () => {
     takeQuest(id!, user!.uid).then(() => {
       fetchQuest();
+      notifyAssignmentSuccess();
     });
   };
+
+  const notifyAssignmentSuccess = () => {
+    const id = 'assignment-success';
+    const closeModal = () => modals.close(id)
+
+    modals.open({
+      title: 'Thank you for taking this quest!',
+      modalId: id,
+      children: (
+        <>
+          <Text size="sm" mb="md">
+            Next steps: Contact the quest owner to get more details and start working on the quest.
+          </Text>
+          <Button variant="light" onClick={closeModal}>
+            I got it!
+          </Button>
+        </>
+      ),
+    });
+  }
 
   const unassignQuest = () => {
     withdrawQuest(id!).then(() => {
