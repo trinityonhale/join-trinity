@@ -1,5 +1,5 @@
 import { DocumentReference, Timestamp } from 'firebase/firestore';
-import { Role, QuestUrgency, QuestStatus } from './constants';
+import { Role, QuestUrgency, QuestStatus, ProposalStatus } from './constants';
 
 interface BaseModel {
     schemaVersion?: number,
@@ -7,13 +7,14 @@ interface BaseModel {
 
 export type AnyUser = UserV1
 export type AnyQuest = QuestV1
+export type AnyProposal = ProposalV1
 
 export interface UserV1 extends BaseModel {
     readonly schemaVersion: 1;
     uid: string;
     displayName: string;
     photoUrl: string;
-    role: Role;
+    role?: Role;
 }
 
 export type QuestV1 = BaseModel & {
@@ -26,6 +27,43 @@ export type QuestV1 = BaseModel & {
     createdAt: Timestamp,
     status: QuestStatus,
     assignnment?: QuestAssignment,
+}
+
+export type ProposalV1 = BaseModel & {
+    readonly schemaVersion: 1,
+    title: string,
+    content: string,
+    status: ProposalStatus.pending,
+    attachments?: ProposalAttachment[],
+    signatures?: ProposalSignature[],
+    comments?: ProposalComment[],
+    createdAt: Timestamp,
+    uid: string,
+
+    // propagated
+    author?: AnyUser,
+}
+
+export type ProposalComment = Comments & {
+    yay: boolean
+}
+
+export type Comments = BaseModel & {
+    readonly schemaVersion: 1,
+    author: AnyUser,
+    content: string,
+    createdAt: Timestamp,
+}
+
+export type ProposalAttachment = BaseModel & {
+    readonly schemaVersion: 1,
+    url: string,
+    name: string
+}
+
+export type ProposalSignature = BaseModel & {
+    user: AnyUser,
+    createdAt: Timestamp
 }
 
 export type QuestAssignment = {

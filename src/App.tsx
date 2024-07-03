@@ -7,12 +7,15 @@ import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { Routes, Route, Navigate } from "react-router-dom";
 import loadable from "@loadable/component";
-import EditQuest from "./fragments/EditQuest";
 
 const Quests = loadable(() => import("./views/Quests"));
 const MyQuests = loadable(() => import("./views/MyQuests"));
 const ShowQuestDetail = loadable(() => import("./fragments/ShowQuestDetail"));
+const EditQuest = loadable(() => import("./fragments/EditQuest"));
 
+const Proposals = loadable(() => import("./views/Proposals"));
+const CreateProposal = loadable(() => import("./views/CreateProposal"))
+const ProposalDetail = loadable(() => import("./views/ProposalDetail"));
 
 export default function App() {
 
@@ -30,6 +33,9 @@ export default function App() {
               <Route path=":id" element={<ShowQuestDetail />} />
               <Route path=":id/edit" element={<EditQuest />} />
             </Route>
+            <Route path="/proposals" element={<Proposals />} />
+            <Route path="/proposals/create" element={<CreateProposal />} />
+            <Route path="/proposals/:id" element={<ProposalDetail />} />
           </Routes>
       </ModalsProvider>
     </MantineProvider>

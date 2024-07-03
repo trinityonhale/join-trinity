@@ -14,3 +14,11 @@ export enum QuestStatus {
     adopted = 'adopted',
     closed = 'closed'
 }
+
+export enum ProposalStatus {
+    pending = 'pending',
+    considering = 'considering', // enough signatures collected
+    accepted = 'accepted', // proposal has been accepted
+    rejected = 'rejected', // proposal has been rejected
+    dropped = 'dropped' // proposal dropped
+}

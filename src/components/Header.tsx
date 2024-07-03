@@ -9,8 +9,8 @@ import {
   Loader,
   ActionIcon,
   Box,
-  Divider,
   em,
+  UnstyledButton,
 } from "@mantine/core";
 
 import { useMediaQuery } from "@mantine/hooks";
@@ -23,6 +23,7 @@ import {
   IconBrandGoogleFilled,
   IconMessageCircleQuestion,
   IconChecklist,
+  IconLayoutKanban,
 } from "@tabler/icons-react";
 
 // import { useDisclosure } from "@mantine/hooks";
@@ -34,7 +35,7 @@ import { upsertUser } from "@/dao/UserDao";
 import Logo from "./Logo";
 import { Role } from "@/db/constants";
 import { modals } from "@mantine/modals";
-import { Link } from "react-router-dom";
+import { Link, useMatch } from "react-router-dom";
 import { createQuest, getQuest } from "@/dao/QuestDao";
 import { UseFormReturnType } from "@mantine/form";
 import { DocumentReference } from "firebase/firestore";
@@ -66,27 +67,21 @@ function UserMenu() {
   };
 
   const createNewQuestHandler = () => {
-    const Form = lazy(() => import("@/fragments/CreateQuestsForm"))
+    const Form = lazy(() => import("@/fragments/CreateQuestsForm"));
 
     const submitHandler = async (values: any, form: UseFormReturnType<any>) => {
       createQuest(values).then(async (ref: DocumentReference) => {
         form.reset();
-        // TODO: close current maybe 
+        // TODO: close current maybe
         modals.closeAll();
         notifications.show({
           title: "Quest created",
           message: "Quest has been created successfully",
           color: "green",
-        })
-        publish(EVT_QUEST_CREATED, await getQuest(ref.id))
-      }).catch((error) => {
-        notifications.show({
-          title: "Failed to create quest",
-          message: error.message,
-          color: "red",
-        })
-      })
-    }
+        });
+        publish(EVT_QUEST_CREATED, await getQuest(ref.id));
+      });
+    };
 
     modals.open({
       title: "Create new quest",
@@ -186,7 +181,7 @@ function UserMenu() {
             />
           }
         >
-          Logout
+          Se Logout
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
@@ -239,6 +234,59 @@ function SignInButton() {
   );
 }
 
+function SelectBoardMenuItem({ to, name, description, icon }: any) {
+  return (
+    <Menu.Item component={Link} to={to}>
+      <Group>
+      {icon}
+      <Box flex={1}>
+      <Text size="sm" fw={500}>{name}</Text>
+      <Text size="sm" c="dimmed">
+        {description}
+      </Text>
+      </Box>
+      </Group>
+    </Menu.Item>
+  );
+}
+
+function SelectBoardMenu() {
+
+  const isQuests = useMatch("/quests");
+
+  const currentBoard = isQuests ? "Quest Board" : "Proposals";
+
+  return (
+    <Menu
+      position="bottom-start"
+      transitionProps={{ transition: "pop-top-left" }}
+      width={320}
+      shadow="md"
+    >
+      <Menu.Target>
+        <Button variant="outline" rightSection={<IconChevronDown />}>
+          {currentBoard}
+        </Button>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <SelectBoardMenuItem
+          to="/quests"
+          name="Quest Board"
+          description="Trinity needs your help, pick a quest to help us out!"
+          icon={<IconLayoutKanban stroke={1.5}/>}
+        />
+        <SelectBoardMenuItem
+          to="/proposals"
+          name="Proposals"
+          description="Contribute your ideas to make Trinity a better place"
+          icon={<IconMessageCircleQuestion stroke={1.5}/>}
+        />
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
 export default function Header() {
   // const [opened, { toggle }] = useDisclosure(false);
 
@@ -255,10 +303,7 @@ export default function Header() {
       <Group justify="space-between" py="sm">
         <Group>
           <Logo />
-          <Divider orientation="vertical" />
-          <Text fs="xl" fw={500} c="dimmed">
-            Quest Board
-          </Text>
+          <SelectBoardMenu />
         </Group>
 
         {/* <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" /> */}

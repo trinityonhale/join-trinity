@@ -13,17 +13,29 @@
     "ui": {
       "enabled": true
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "hosting": {
+      "port": 5002
+    },
+    "storage": {
+      "port": 9199
+    }
   },
   "hosting": {
     "cleanUrls": true,
     "public": "dist",
-    "rewrites": [{
-      "source": "**",
-      "destination": "/index.html"
-    }, {
-      "source": "!/@(js|css|svg)/**",
-      "destination": "/index.html"
-    }]
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "!/@(js|css|svg)/**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

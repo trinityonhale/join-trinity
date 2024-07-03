@@ -28,3 +28,14 @@ export async function getUserRole(uid: string): Promise<Role> {
   const document = await getDoc(doc(db, "users", uid));
   return document.data()?.role ?? Role.user;
 }
+
+export async function getUserById(uid: string): Promise<any>
+{
+  const document = await getDoc(doc(db, "users", uid));
+
+  return {
+    uid: document.data()?.uid,
+    displayName: document.data()?.displayName,
+    photoUrl: document.data()?.photoUrl
+  }
+}
