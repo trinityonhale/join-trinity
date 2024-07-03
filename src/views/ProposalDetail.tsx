@@ -1,4 +1,4 @@
-import { getProposal } from "@/dao/ProposalDao";
+import { checkIsAlreadySigned, getProposal } from "@/dao/ProposalDao";
 import { getUserById } from "@/dao/UserDao";
 import { AnyProposal, UserV1 } from "@/db/model";
 import {
@@ -76,6 +76,67 @@ function ProposalTimeline(props: { status: ProposalStatus }) {
     </Timeline>
   );
 }
+
+function SignatureButton() {
+
+  enum SignStatus {
+    LOADING = 'loading',
+    SIGNED = 'signed',
+    UNSIGNED = 'unsigned'
+  }
+
+  const [signStatus, setSignStatus] = useState<SignStatus>(SignStatus.LOADING)
+
+  const { id } = useParams();
+  const { user } = useAuthProvider();
+
+  const checkSignStatus = async () => {
+    if (!user) return
+    setSignStatus(SignStatus.LOADING)
+    const status = await checkIsAlreadySigned(id!, user!);
+    setSignStatus(status ? SignStatus.SIGNED : SignStatus.UNSIGNED)
+  }
+
+  useEffect(() => {
+    checkSignStatus()
+  }, [user])
+
+  const signProposal = () => {
+    const signProposalHandler = async () => {
+      await signProposalAction(id!, user!);
+      await checkSignStatus()
+    };
+
+    console.debug("signing proposal for user", user)
+
+    modals.openConfirmModal({
+      title: "Sign proposal",
+      children: (
+        <Text size="sm">
+          Please confirm you are going to sign this proposal, signature cannot
+          be reversed
+        </Text>
+      ),
+      onConfirm: signProposalHandler,
+      labels: { confirm: "Sign", cancel: "Cancel" },
+    });
+  };
+
+  return (
+    <>
+    { user && <Button fullWidth mt="xl" onClick={signProposal} 
+      loading={signStatus == SignStatus.LOADING}
+      disabled={signStatus != SignStatus.UNSIGNED}
+    >
+      {signStatus == SignStatus.SIGNED ? 'Signed' : 'Sign the proposal'}
+    </Button>}
+    { !user && <Button fullWidth mt="xl">
+      Log in to sign
+    </Button>
+    }
+    </>
+  )
+}
 export default function ProposalDetail() {
   type Attachment = {
     name: string;
@@ -86,7 +147,6 @@ export default function ProposalDetail() {
   const [proposal, setProposal] = useState<AnyProposal | null>();
   const [author, setAuthor] = useState<UserV1 | null>();
   const [attachments, setAttachments] = useState<Attachment[]>();
-  const { user } = useAuthProvider();
 
   const fetchProposal = async () => {
     getProposal(id!).then((doc) => {
@@ -127,27 +187,6 @@ export default function ProposalDetail() {
     return list;
   };
 
-  const signProposal = () => {
-    const signProposalHandler = async () => {
-      await signProposalAction(id!, user!);
-      fetchProposal();
-    };
-
-    console.debug("signing proposal for user", user)
-
-    modals.openConfirmModal({
-      title: "Sign proposal",
-      children: (
-        <Text size="sm">
-          Please confirm you are going to sign this proposal, signature cannot
-          be reversed
-        </Text>
-      ),
-      onConfirm: signProposalHandler,
-      labels: { confirm: "Sign", cancel: "Cancel" },
-    });
-  };
-
   useEffect(() => {
     fetchProposal();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -174,7 +213,7 @@ export default function ProposalDetail() {
             </ThemeIcon>
             <Box>
               <Text size="lg" fw={500} lh={1} mb={4}>
-                8
+                { proposal?.signaturesCount?.toString() ?? '0' }
               </Text>
               <Text size="sm" lh={1}>
                 signature(s) collected
@@ -187,9 +226,8 @@ export default function ProposalDetail() {
             <ProposalTimeline
               status={proposal?.status ?? ProposalStatus.pending}
             />
-            <Button fullWidth mt="xl" onClick={signProposal}>
-              Sign the proposal
-            </Button>
+
+            <SignatureButton />
           </Box>
           <Box w="100%" flex={1}>
             <Container size="sm">

@@ -1,20 +1,20 @@
-import { AnyProposal, AnyUser } from "@/db/model";
+import { AnyProposal } from "@/db/model";
 import {
   addDoc,
   collection,
   doc,
   DocumentReference,
   DocumentSnapshot,
-  getCountFromServer,
   getDoc,
   getDocs,
+  increment,
   limit,
   Query,
   query,
   QueryDocumentSnapshot,
   startAfter,
-  startAt,
   Timestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -60,13 +60,34 @@ export async function getProposal(
     return getDoc(doc(db, "proposals", id))
 }
 
+export async function checkIsAlreadySigned(id: string, user: any): Promise<boolean> {
+
+    const proposalRef = doc(db, "proposals", id);
+
+    const signatureQuery = query(
+        collection(proposalRef, 'signatures'),
+        where("uid", "==", user.uid)
+    )
+
+    const snapshot = await getDocs(signatureQuery)
+
+    return !snapshot.empty
+}
+
 export async function signProposal(id: string, user: any): Promise<void> {
     // signatures is a sub collection of proposal
     const proposalRef = doc(db, "proposals", id);
+
+    // adding signature
     await addDoc(collection(proposalRef, 'signatures'), {
       uid: user.uid,
       displayName: user.displayName,
       photoUrl: user.photoURL,
       createdAt: Timestamp.now()
+    })
+
+    // update count
+    updateDoc(proposalRef, {
+      signaturesCount: increment(1)
     })
 }

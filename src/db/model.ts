@@ -38,6 +38,8 @@ export type ProposalV1 = BaseModel & {
     signatures?: ProposalSignature[],
     comments?: ProposalComment[],
     createdAt: Timestamp,
+    signaturesCount?: Number,
+    commentsCount?: Number,
     uid: string,
 
     // propagated

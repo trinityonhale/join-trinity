@@ -81,9 +81,7 @@ service cloud.firestore {
       ], []) && request.resource.data.status == 'pending'
 
       allow read: if true;
-    }
 
-    match /proposals/{proposalId} {
       allow update: if isAdmin() || (isLoggedIn() && isAuthor());
       allow delete: if isAdmin();
     }
@@ -92,6 +90,8 @@ service cloud.firestore {
       allow create: if isLoggedIn() 
       && request.resource.data.keys().hasAll(['uid', 'displayName', 'createdAt', 'photoUrl'])
       && request.resource.data.uid == request.auth.uid;
+
+      allow read: if true;
     }
   }
 }
