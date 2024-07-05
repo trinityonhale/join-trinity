@@ -22,3 +22,5 @@ export enum ProposalStatus {
     rejected = 'rejected', // proposal has been rejected
     dropped = 'dropped' // proposal dropped
 }
+
+export const PROPOSAL_SIGNATURES_THRESHOLD = 1
