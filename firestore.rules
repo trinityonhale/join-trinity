@@ -82,8 +82,18 @@ service cloud.firestore {
 
       allow read: if true;
 
-      allow update: if isAdmin() || (isLoggedIn() && isAuthor());
+      allow update: if isAdmin() || (isLoggedIn() && (isAuthor() || isSignedFieldUpdate()));
       allow delete: if isAdmin();
+
+      function isSignedFieldUpdate() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['signaturesCount']);
+      }
+
+      // function isCountMatch() {
+      //   // Ensure signaturesCount matches the number of documents in the 'signatures' subcollection
+      //   return get(/databases/$(database)/documents/proposals/$(document)/signatures)
+      //         .size() == resource.data.signaturesCount;
+      // }
     }
 
     match /proposals/{proposalId}/signatures/{documents=**} {

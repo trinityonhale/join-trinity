@@ -27,6 +27,8 @@ import { PROPOSAL_SIGNATURES_THRESHOLD, ProposalStatus } from "@/db/constants";
 import { getDownloadURL, getStorage, listAll, ref } from "firebase/storage";
 import { modals } from "@mantine/modals";
 import { useAuthProvider } from "@/providers/AuthProvider";
+import ProposalComments from "@/fragments/ProposalComments";
+import ProposalSignatures from "@/fragments/ProposalSignatures";
 
 function ProposalTimeline(props: { status: ProposalStatus }) {
   const activeStatus = () => {
@@ -105,6 +107,7 @@ function SignatureButton() {
     const signProposalHandler = async () => {
       await signProposalAction(id!, user!);
       await checkSignStatus();
+      window.location.reload();
     };
 
     console.debug("signing proposal for user", user);
@@ -225,6 +228,7 @@ export default function ProposalDetail() {
               <Text size="sm" lh={1}>
                 signature(s) collected
               </Text>
+              <ProposalSignatures signaturesCount={proposal?.signaturesCount ?? 0}/>
             </Box>
           </Group>
         </Group>
@@ -249,7 +253,7 @@ export default function ProposalDetail() {
                     This proposal has collected enough signatures and is ready
                     to be carried to next stage
 
-                    <Button variant="light" mt="md">Carries</Button>
+                    <Button variant="light" mt="md">Carry</Button>
                   </Alert>
                 )}
 
@@ -267,7 +271,7 @@ export default function ProposalDetail() {
 
               {attachments && (
                 <Card w="100%" mb="md">
-                  <Text fw={500} mb="xs">
+                  <Text fw={500} mb="md">
                     Attachments
                   </Text>
 
@@ -283,7 +287,10 @@ export default function ProposalDetail() {
               )}
 
               <Card w="100%" mb="md">
-                Discussions
+                <Text fw={500} mb="md">
+                  Discussions
+                </Text>
+                <ProposalComments />
               </Card>
             </Container>
           </Box>

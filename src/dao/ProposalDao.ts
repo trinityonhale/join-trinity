@@ -1,4 +1,4 @@
-import { AnyProposal } from "@/db/model";
+import { AnyProposal, AnyUser } from "@/db/model";
 import {
   addDoc,
   collection,
@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { ProposalStatus } from "@/db/constants";
+import { User } from "@/db/schema";
 
 export function createProposal(
   proposal: AnyProposal
@@ -90,4 +91,14 @@ export async function signProposal(id: string, user: any): Promise<void> {
     updateDoc(proposalRef, {
       signaturesCount: increment(1)
     })
+}
+
+export async function getNewSignatures(id: string): Promise<User[]> {
+
+    const proposalRef = doc(db, "proposals", id);
+
+    // query limit to 3
+    const docs = await getDocs(query(collection(proposalRef, 'signatures'), limit(3)))
+
+    return docs.docs.map((doc) => doc.data() as User)
 }
