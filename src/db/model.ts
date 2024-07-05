@@ -46,13 +46,15 @@ export type ProposalV1 = BaseModel & {
     author?: AnyUser,
 }
 
-export type ProposalComment = Comments & {
-    yay: boolean
-}
+export type ProposalComment = Comments & {}
 
 export type Comments = BaseModel & {
     readonly schemaVersion: 1,
-    author: AnyUser,
+    author: {
+        displayName: string,
+        photoUrl: string
+        uid: string,
+    },
     content: string,
     createdAt: Timestamp,
 }

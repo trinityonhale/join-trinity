@@ -33,10 +33,10 @@ export function ProposalItem({ proposal }: { proposal: AnyProposal}) {
         </Box>
 
         <Group gap="sm">
-          <Group gap="xs">
+          {/* <Group gap="xs">
             <IconMessages size="16" />
             <Text size="sm">{ proposal.commentsCount?.toString() ?? '0' }</Text>
-          </Group>
+          </Group> */}
 
           <Group gap="xs">
             <IconFlare size="16" />

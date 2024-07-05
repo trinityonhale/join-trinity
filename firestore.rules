@@ -103,5 +103,13 @@ service cloud.firestore {
 
       allow read: if true;
     }
+
+    match /proposals/{proposalId}/comments/{documents=**} {
+      allow create: if isLoggedIn() 
+      && request.resource.data.keys().hasAll(['author', 'content', 'createdAt'])
+      && request.resource.data.author.uid == request.auth.uid;
+
+      allow read: if true;
+    }
   }
 }

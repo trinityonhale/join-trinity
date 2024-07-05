@@ -1,4 +1,4 @@
-import { AnyProposal, AnyUser } from "@/db/model";
+import { AnyProposal, AnyUser, ProposalComment } from "@/db/model";
 import {
   addDoc,
   collection,
@@ -101,4 +101,33 @@ export async function getNewSignatures(id: string): Promise<User[]> {
     const docs = await getDocs(query(collection(proposalRef, 'signatures'), limit(3)))
 
     return docs.docs.map((doc) => doc.data() as User)
+}
+
+export async function createComment(proposalId: string, comment: ProposalComment): Promise<DocumentReference> {
+    const proposalRef = doc(db, "proposals", proposalId)
+
+    return addDoc(collection(proposalRef, 'comments'), comment)
+}
+
+export async function getNextPageOfComments(
+  proposalId: string, 
+  lastDocument: QueryDocumentSnapshot | null,
+  pageSize: number,
+): Promise<QueryDocumentSnapshot[]> {
+    const proposalRef = doc(db, "proposals", proposalId)
+    let baseQuery: Query = collection(proposalRef, "comments");
+
+    // If lastDocument is provided, start after it
+    if (lastDocument) {
+      baseQuery = query(
+        baseQuery,
+        startAfter(lastDocument)
+      );
+    }
+  
+    const nextPageQuery = query(baseQuery, limit(pageSize));
+  
+    const snapshot = await getDocs(nextPageQuery);
+  
+    return snapshot.docs;
 }
