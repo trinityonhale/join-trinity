@@ -10,6 +10,7 @@ import {
   Badge,
   Box,
   Title,
+  Select,
 } from "@mantine/core";
 import { IconFlare, IconMessages } from "@tabler/icons-react";
 import { QueryDocumentSnapshot } from "firebase/firestore";
@@ -17,9 +18,18 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export function ProposalItem({ proposal }: { proposal: AnyProposal}) {
+
+  const colorMap: { [key in ProposalStatus]: string } = {
+    [ProposalStatus.accepted]: "green",
+    [ProposalStatus.pending]: "blue",
+    [ProposalStatus.considering]: "yellow",
+    [ProposalStatus.dropped]: "gray",
+    [ProposalStatus.rejected]: "red"
+  }
+
   return (
     <Box py="sm">
-      <Badge color="blue" variant="dot">
+      <Badge color={colorMap[proposal.status]} variant="dot">
         {proposal.status}
       </Badge>
       <Group mt="sm">
@@ -50,18 +60,30 @@ export function ProposalItem({ proposal }: { proposal: AnyProposal}) {
 
 export default function Proposals() {
 
+  type FilterValues = "Pending" | "Reviewed"
+  const [filter, setFilter] = useState<FilterValues>("Pending");
   const [proposals, setProposals] = useState<QueryDocumentSnapshot[]>([]);
 
-  const fetchProposal = () => {
-    return getNextPageOfProposals(null, 15, ProposalStatus.pending).then((docs) => {
-      console.log(docs)
-      setProposals([...proposals, ...docs])
+  const fetchProposal = (clear=false) => {
+    return getNextPageOfProposals(null, 100, filter === "Pending" ? [
+      ProposalStatus.pending,
+      ProposalStatus.considering
+    ] : [
+      ProposalStatus.accepted,
+      ProposalStatus.rejected,
+      ProposalStatus.dropped
+    ]).then((docs) => {
+      if (clear) {
+        setProposals(docs)
+      } else {
+        setProposals([...proposals, ...docs])
+      }
     })
   }
 
   useEffect(() => {
-    fetchProposal()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    fetchProposal(true)
+  }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container size="xl" mt="lg">
@@ -70,6 +92,15 @@ export default function Proposals() {
         <Button component={Link}
         to="/proposals/create"
         >Submit a proposal</Button>
+      </Group>
+
+      <Group mb="lg">
+        <Select
+          data={["Pending", "Reviewed"]}
+          value= {filter}
+          onChange={(value) => setFilter(value as FilterValues)}
+        >
+        </Select>
       </Group>
       <Card py={0}>
         {proposals.map((proposal) => (

@@ -24,12 +24,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const PROPOSAL_TEMPLATE = `
+<p>In this document, a person or group of people will author a document describing a proposal and asking for feedback on it from the rest of the organization.</p>
 <h2>Summary</h2>
 <p>One paragraph explanation of the proposal</p>
 <h2>Motivation / Benefits</h2>
 <p>Why are we doing this? What is the expected outcome?</p>
 <h2>Approach</h2>
-<p>The recommended approach to fulfill the needs presented in the previous section is a structured RFC process. In this document, a person or group of people will author a document describing a proposal and asking for feedback on it from the rest of the organization.
+<p>The recommended approach to fulfill the needs presented in the previous section.
 <h2>Drawbacks</h2>
 <p>Why should we not do this?</p>
 `;

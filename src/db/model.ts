@@ -33,7 +33,7 @@ export type ProposalV1 = BaseModel & {
     readonly schemaVersion: 1,
     title: string,
     content: string,
-    status: ProposalStatus.pending,
+    status: ProposalStatus,
     attachments?: ProposalAttachment[],
     signatures?: ProposalSignature[],
     comments?: ProposalComment[],
@@ -41,6 +41,7 @@ export type ProposalV1 = BaseModel & {
     signaturesCount?: number,
     commentsCount?: number,
     uid: string,
+    reply?: string,
 
     // propagated
     author?: AnyUser,
@@ -51,8 +52,8 @@ export type ProposalComment = Comments & {}
 export type Comments = BaseModel & {
     readonly schemaVersion: 1,
     author: {
-        displayName: string,
-        photoUrl: string
+        displayName?: string,
+        photoUrl?: string
         uid: string,
     },
     content: string,
@@ -68,6 +69,12 @@ export type ProposalAttachment = BaseModel & {
 export type ProposalSignature = BaseModel & {
     user: AnyUser,
     createdAt: Timestamp
+}
+
+export type ProposalStatusTimelineItem = BaseModel & {
+    readonly schemaVersion: 1,
+    status: ProposalStatus,
+    updatedAt: Timestamp
 }
 
 export type QuestAssignment = {

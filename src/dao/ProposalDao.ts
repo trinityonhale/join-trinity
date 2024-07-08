@@ -9,6 +9,7 @@ import {
   getDocs,
   increment,
   limit,
+  orderBy,
   Query,
   query,
   QueryDocumentSnapshot,
@@ -33,7 +34,7 @@ export function createProposal(
 export async function getNextPageOfProposals(
   lastDocument: QueryDocumentSnapshot | null,
   pageSize: number,
-  status: ProposalStatus
+  status: ProposalStatus[]
 ): Promise<QueryDocumentSnapshot[]> {
   let baseQuery: Query = collection(db, "proposals");
 
@@ -41,11 +42,11 @@ export async function getNextPageOfProposals(
   if (lastDocument) {
     baseQuery = query(
       baseQuery,
-      where("status", "==", status),
+      where("status", "in", status),
       startAfter(lastDocument)
     );
   } else {
-    baseQuery = query(baseQuery, where("status", "==", status));
+    baseQuery = query(baseQuery, where("status", "in", status));
   }
 
   const nextPageQuery = query(baseQuery, limit(pageSize));
@@ -130,4 +131,48 @@ export async function getNextPageOfComments(
     const snapshot = await getDocs(nextPageQuery);
   
     return snapshot.docs;
+}
+
+export async function changeProposalStatus(
+  proposalId: string,
+  status: ProposalStatus
+) {
+  const proposalRef = doc(db, "proposals", proposalId)
+  const proposalTimelineRef = collection(proposalRef, 'statusTimeline')
+
+  // Add the new status to the timeline
+  await addDoc(proposalTimelineRef, {
+    schemaVersion: 1,
+    createdAt: Timestamp.now(),
+    status
+  })
+
+  await updateDoc(proposalRef, {
+    status
+  })
+}
+
+export async function finalizeProposal(
+  proposalId: string,
+  status: ProposalStatus,
+  reply: string
+) {
+  await changeProposalStatus(proposalId, status)
+
+  const proposalRef = doc(db, "proposals", proposalId)
+
+  await updateDoc(proposalRef, {
+    reply: reply
+  })
+}
+
+export async function getProposalTimeline(proposalId: string) {
+  const proposalRef = doc(db, "proposals", proposalId)
+  const timelineRef = collection(proposalRef, 'statusTimeline')
+
+  const q = query(timelineRef, orderBy("createdAt", "asc"))
+
+  const snapshot = await getDocs(q)
+
+  return snapshot.docs
 }

@@ -1,4 +1,10 @@
-import { checkIsAlreadySigned, getProposal } from "@/dao/ProposalDao";
+import {
+  changeProposalStatus,
+  checkIsAlreadySigned,
+  finalizeProposal,
+  getProposal,
+  getProposalTimeline,
+} from "@/dao/ProposalDao";
 import { getUserById } from "@/dao/UserDao";
 import { AnyProposal, UserV1 } from "@/db/model";
 import {
@@ -14,6 +20,7 @@ import {
   Button,
   Anchor,
   Alert,
+  Textarea,
 } from "@mantine/core";
 
 import { signProposal as signProposalAction } from "@/dao/ProposalDao";
@@ -29,10 +36,14 @@ import { modals } from "@mantine/modals";
 import { useAuthProvider } from "@/providers/AuthProvider";
 import ProposalComments from "@/fragments/ProposalComments";
 import ProposalSignatures from "@/fragments/ProposalSignatures";
+import { QueryDocumentSnapshot } from "firebase/firestore";
 
-function ProposalTimeline(props: { status: ProposalStatus }) {
+function ProposalTimeline(props: {
+  id: string | null;
+  proposal?: AnyProposal | null;
+}) {
   const activeStatus = () => {
-    switch (props.status) {
+    switch (props.proposal?.status) {
       case ProposalStatus.pending:
         return 0;
       case ProposalStatus.considering:
@@ -44,38 +55,43 @@ function ProposalTimeline(props: { status: ProposalStatus }) {
     }
   };
 
+  const [timeline, setTimeline] = useState<QueryDocumentSnapshot[]>([]);
+
+  const getTimeline = async () => {
+    if (!props.id) return;
+    const data = await getProposalTimeline(props.id!);
+    setTimeline(data);
+  };
+
+  useEffect(() => {
+    getTimeline();
+  }, [props.id]);
+
+  const capitalize = function (s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
   return (
-    <Timeline active={activeStatus()} lineWidth={2} bulletSize={24}>
+    <Timeline
+      active={activeStatus()}
+      lineWidth={2}
+      bulletSize={24}
+      color="yellow"
+    >
       {/* items */}
-      <Timeline.Item title="Collect Signature" color="yellow">
+      <Timeline.Item title="Collecting Signature">
         <Text size="xs" mt={4}>
-          2 hours ago
+          {props.proposal?.createdAt.toDate().toLocaleString()}
         </Text>
       </Timeline.Item>
 
-      <Timeline.Item title="Under Consideration" color="blue">
-        <Text size="xs" mt={4}>
-          52 minutes ago
-        </Text>
-      </Timeline.Item>
-
-      <Timeline.Item title="Approved" color="green">
-        <Text size="xs" mt={4}>
-          Just now
-        </Text>
-      </Timeline.Item>
-
-      <Timeline.Item title="Rejected" color="red">
-        <Text size="xs" mt={4}>
-          Just now
-        </Text>
-      </Timeline.Item>
-
-      <Timeline.Item title="Dropped" color="red">
-        <Text size="xs" mt={4}>
-          Just now
-        </Text>
-      </Timeline.Item>
+      {timeline.map((item, index) => (
+        <Timeline.Item title={capitalize(item.data().status)} key={index}>
+          <Text size="xs" mt={4}>
+            {item.data().createdAt.toDate().toLocaleString()}
+          </Text>
+        </Timeline.Item>
+      ))}
     </Timeline>
   );
 }
@@ -197,6 +213,20 @@ export default function ProposalDetail() {
     return list;
   };
 
+  const changeStatusToConsidering = async () => {
+    await changeProposalStatus(id!, ProposalStatus.considering);
+    window.location.reload();
+  };
+
+  const [reply, setReply] = useState("");
+
+  const btnFinalizeDisabled = reply.trim().length === 0;
+
+  const finalize = async (status: ProposalStatus) => {
+    await finalizeProposal(id!, status, reply);
+    window.location.reload();
+  };
+
   useEffect(() => {
     fetchProposal();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -228,21 +258,22 @@ export default function ProposalDetail() {
               <Text size="sm" lh={1}>
                 signature(s) collected
               </Text>
-              <ProposalSignatures signaturesCount={proposal?.signaturesCount ?? 0}/>
+              <ProposalSignatures
+                signaturesCount={proposal?.signaturesCount ?? 0}
+              />
             </Box>
           </Group>
         </Group>
         <Flex mt="lg">
           <Box w="300px">
-            <ProposalTimeline
-              status={proposal?.status ?? ProposalStatus.pending}
-            />
+            <ProposalTimeline proposal={proposal} id={id!} />
 
-            <SignatureButton />
+            {proposal?.status == ProposalStatus.pending && <SignatureButton />}
           </Box>
           <Box w="100%" flex={1}>
             <Container size="sm">
               {role == "admin" &&
+                proposal?.status === ProposalStatus.pending &&
                 (proposal?.signaturesCount ?? 0) >=
                   PROPOSAL_SIGNATURES_THRESHOLD && (
                   <Alert
@@ -252,10 +283,63 @@ export default function ProposalDetail() {
                   >
                     This proposal has collected enough signatures and is ready
                     to be carried to next stage
-
-                    <Button variant="light" mt="md">Carry</Button>
+                    <Button
+                      variant="light"
+                      mt="md"
+                      onClick={changeStatusToConsidering}
+                    >
+                      Carry
+                    </Button>
                   </Alert>
                 )}
+
+              {role == "admin" &&
+                proposal?.status === ProposalStatus.considering && (
+                  <Alert
+                    title="Awaiting for council's reply"
+                    mb="md"
+                    icon={<IconInfoCircle />}
+                  >
+                    <Textarea
+                      placeholder="Details about this decision"
+                      mt="xs"
+                      value={reply}
+                      onChange={(event) => setReply(event.currentTarget.value)}
+                      mb="md"
+                    ></Textarea>
+                    <Group>
+                      <Button
+                        disabled={btnFinalizeDisabled}
+                        variant="light"
+                        onClick={() => finalize(ProposalStatus.accepted)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        disabled={btnFinalizeDisabled}
+                        variant="light"
+                        onClick={() => finalize(ProposalStatus.rejected)}
+                      >
+                        Reject
+                      </Button>
+                      <Button
+                        disabled={btnFinalizeDisabled}
+                        variant="light"
+                        onClick={() => finalize(ProposalStatus.dropped)}
+                      >
+                        Drop
+                      </Button>
+                    </Group>
+                  </Alert>
+                )}
+
+              <Alert
+                title={`Proposal ${proposal?.status}`}
+                mb="md"
+                icon={<IconInfoCircle />}
+              >
+                {proposal?.reply}
+              </Alert>
 
               <Card w="100%" mb="md">
                 <TypographyStylesProvider>
