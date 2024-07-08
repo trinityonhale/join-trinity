@@ -1,4 +1,4 @@
-import { AnyProposal, AnyUser, ProposalComment } from "@/db/model";
+import { AnyProposal, ProposalComment } from "@/db/model";
 import {
   addDoc,
   collection,

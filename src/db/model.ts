@@ -47,7 +47,7 @@ export type ProposalV1 = BaseModel & {
     author?: AnyUser,
 }
 
-export type ProposalComment = Comments & {}
+export type ProposalComment = Comments & object
 
 export type Comments = BaseModel & {
     readonly schemaVersion: 1,

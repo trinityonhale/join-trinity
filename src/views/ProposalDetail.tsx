@@ -65,9 +65,9 @@ function ProposalTimeline(props: {
 
   useEffect(() => {
     getTimeline();
-  }, [props.id]);
+  }, [props.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const capitalize = function (s) {
+  const capitalize = function (s: string) {
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
 
@@ -117,7 +117,7 @@ function SignatureButton() {
 
   useEffect(() => {
     checkSignStatus();
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const signProposal = () => {
     const signProposalHandler = async () => {

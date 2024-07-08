@@ -101,6 +101,7 @@ export default function ProposalComments() {
       {comments.map((comment) => (
         <ProposalComment key={comment.id} data={comment.data()} />
       ))}
+      {hasMoreData && <Button>Load More</Button>}
     </>
   );
 }

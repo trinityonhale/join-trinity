@@ -1,7 +1,6 @@
 import Editor from "@/components/Editor";
 import { createProposal } from "@/dao/ProposalDao";
 import { ProposalStatus } from "@/db/constants";
-import { AnyProposal, ProposalV1 } from "@/db/model";
 import { useAuthProvider } from "@/providers/AuthProvider";
 import {
   Box,
@@ -90,6 +89,7 @@ export default function ProposalForm() {
         color: "green",
       });
     } catch (e) {
+      console.error("error submitting proposal", e)
     } finally {
       setLoading(false);
     }
@@ -105,7 +105,7 @@ export default function ProposalForm() {
     const storage = getStorage();
 
     attachments.map((file: File) => {
-      let task = uploadBytesResumable(
+      const task = uploadBytesResumable(
         ref(storage, `/proposal-attachments/${proposalId}/${file.name}`),
         file
       );

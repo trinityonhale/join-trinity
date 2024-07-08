@@ -12,7 +12,7 @@ import {
   Title,
   Select,
 } from "@mantine/core";
-import { IconFlare, IconMessages } from "@tabler/icons-react";
+import { IconFlare } from "@tabler/icons-react";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";

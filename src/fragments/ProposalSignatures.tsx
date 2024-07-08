@@ -36,7 +36,7 @@ export default function ProposalSignatures({
     getNewSignatures(id!).then((users) => {
       setSignatures(users);
     });
-  }, [signaturesCount]);
+  }, [id, signaturesCount]);
 
   return (
     <UnstyledButton>

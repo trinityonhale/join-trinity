@@ -1,5 +1,5 @@
 import ProposalForm from "@/fragments/ProposalForm";
-import { Box, Button, Card, Container, Title } from "@mantine/core";
+import { Button, Container, Title } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 
